@@ -1,0 +1,145 @@
+﻿using AuthenticationPlugin;
+using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace FarzamTEWebsite.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class UsersController : ControllerBase
+    {
+        private IConfiguration _configuration;
+        private FarzamDbContext _dbContext;
+
+        public UsersController(FarzamDbContext dbContext, IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _dbContext = dbContext;
+        }
+
+        [HttpPost]
+        public IActionResult Register([FromBody] User user)
+        {
+            if (user.FirstName == null)
+                return BadRequest("FirstName is Required!");
+            if (user.LastName == null)
+                return BadRequest("LastName is Required!");
+
+            if (CheckEmailExist(user.Email))
+                return BadRequest("User With Same Email Already Exists!");
+
+            string passcheck = CheckPasswordStrenght(user.Password);
+            if (!string.IsNullOrEmpty(passcheck))
+                return BadRequest(passcheck);
+
+            var UserObject = new User
+            {
+                Email = user.Email,
+                Password = SecurePasswordHasherHelper.Hash(user.Password),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = "Normal",
+            };
+            _dbContext.Users.Add(UserObject);
+            _dbContext.SaveChanges();
+            return Ok("New User Created Successfully");
+        }
+
+        [HttpPost]
+        public IActionResult Login(User user)
+        {
+            var UserEmail = _dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
+            if (UserEmail == null)
+            {
+                return NotFound("User NotFound!");
+            }
+            if (!SecurePasswordHasherHelper.Verify(user.Password, UserEmail.Password))
+            {
+                return Unauthorized("Invalid!");
+            }
+
+            user.Token = CreateJwt(UserEmail);
+            
+            return Ok(new
+            {
+                message = "Welcome Back " + UserEmail.FirstName + " !",
+                Token = user.Token
+            });
+        }
+
+        [Authorize]
+        [HttpPut]
+        public IActionResult EditUser([FromForm] User userObject)
+        {
+            int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = _dbContext.Users.Find(id);
+
+            if (userObject.FirstName != null)
+                user.FirstName = userObject.FirstName;
+            if (userObject.LastName != null)
+                user.LastName = userObject.LastName;
+            if (userObject.Email != null)
+                user.Email = userObject.Email;
+            if (userObject.PhoneNumber != null)
+                user.PhoneNumber = userObject.PhoneNumber;
+            if (userObject.City != null)
+                user.City = userObject.City;
+            if (userObject.PostalCode != null)
+                user.PostalCode = userObject.PostalCode;
+            if (userObject.Address != null)
+                user.Address = userObject.Address;
+
+            _dbContext.SaveChanges();
+            return Ok("User Updated Successfully");
+        }
+
+        private bool CheckEmailExist(string email)
+        {
+            var UserSameEmail = _dbContext.Users.Where(x => x.Email == email).SingleOrDefault();
+            if (UserSameEmail == null)
+                return false;
+            else
+                return true;
+        }
+
+        private string CheckPasswordStrenght(string password)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (password.Length < 8)
+                sb.Append("Minimum Password Should be 8" + Environment.NewLine);
+            if (!(Regex.IsMatch(password, "[a-z]") && Regex.IsMatch(password, "[A-Z]") && Regex.IsMatch(password, "[0-9]")))
+                sb.Append("Password Should be Alphanumeric" + Environment.NewLine);
+            return sb.ToString();
+        }
+
+        private string CreateJwt(User user)
+        {
+            var JwtTokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
+            var identity = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            });
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = identity,
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials,
+            };
+            var token = JwtTokenHandler.CreateToken(tokenDescriptor);
+            return JwtTokenHandler.WriteToken(token);
+        }
+        
+    }
+}
