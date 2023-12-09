@@ -32,8 +32,12 @@ namespace FarzamTEWebsite.Controllers
             if (user.LastName == null)
                 return BadRequest("LastName is Required!");
 
-            if (CheckEmailExist(user.Email))
-                return BadRequest("User With Same Email Already Exists!");
+            if (CheckUserNameExist(user.UserName))
+                return BadRequest("User With Same UserName Already Exists!");
+
+            if (user.Email != null)
+                if (CheckEmailExist(user.Email))
+                    return BadRequest("User With Same Email Already Exists!");
 
             string passcheck = CheckPasswordStrenght(user.Password);
             if (!string.IsNullOrEmpty(passcheck))
@@ -41,6 +45,7 @@ namespace FarzamTEWebsite.Controllers
 
             var UserObject = new User
             {
+                UserName = user.UserName,
                 Email = user.Email,
                 Password = SecurePasswordHasherHelper.Hash(user.Password),
                 FirstName = user.FirstName,
@@ -55,21 +60,18 @@ namespace FarzamTEWebsite.Controllers
         [HttpPost]
         public IActionResult Login(User user)
         {
-            var UserEmail = _dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
-            if (UserEmail == null)
-            {
-                return NotFound("User NotFound!");
-            }
-            if (!SecurePasswordHasherHelper.Verify(user.Password, UserEmail.Password))
-            {
-                return Unauthorized("Invalid!");
-            }
+            var CheckUserName = _dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+            if (CheckUserName == null)
+                return NotFound("UserName NotFound!");
 
-            user.Token = CreateJwt(UserEmail);
+            if (!SecurePasswordHasherHelper.Verify(user.Password, CheckUserName.Password))
+                return Unauthorized("Invalid!");
+
+            user.Token = CreateJwt(CheckUserName);
             
             return Ok(new
             {
-                message = "Welcome Back " + UserEmail.FirstName + " !",
+                message = "Welcome Back " + CheckUserName.FirstName + " !",
                 Token = user.Token
             });
         }
@@ -85,6 +87,8 @@ namespace FarzamTEWebsite.Controllers
                 user.FirstName = userObject.FirstName;
             if (userObject.LastName != null)
                 user.LastName = userObject.LastName;
+            if (userObject.UserName != null)
+                user.UserName = userObject.UserName;
             if (userObject.Email != null)
                 user.Email = userObject.Email;
             if (userObject.PhoneNumber != null)
@@ -109,6 +113,15 @@ namespace FarzamTEWebsite.Controllers
                 return true;
         }
 
+        private bool CheckUserNameExist(string UserName)
+        {
+            var UserSameUserName = _dbContext.Users.Where(x => x.UserName == UserName).SingleOrDefault();
+            if (UserSameUserName == null)
+                return false;
+            else
+                return true;
+        }
+
         private string CheckPasswordStrenght(string password)
         {
             StringBuilder sb = new StringBuilder();
@@ -125,9 +138,8 @@ namespace FarzamTEWebsite.Controllers
             var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
             var identity = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             });
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
