@@ -31,12 +31,14 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+var SitePath = builder.Configuration.GetConnectionString("SitePath");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<FarzamDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins", policy =>
 {
-    policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+    policy.WithOrigins(SitePath).AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
 }));
 
 var app = builder.Build();
