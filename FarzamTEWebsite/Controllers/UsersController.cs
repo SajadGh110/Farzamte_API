@@ -58,30 +58,36 @@ namespace FarzamTEWebsite.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(User user)
+        public Task<IActionResult> Login(User user)
         {
             var CheckUserName = _dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
             if (CheckUserName == null)
-                return NotFound("UserName NotFound!");
+                return Task.FromResult<IActionResult>(NotFound("UserName NotFound!"));
 
             if (!SecurePasswordHasherHelper.Verify(user.Password, CheckUserName.Password))
-                return Unauthorized("Invalid!");
+                return Task.FromResult<IActionResult>(Unauthorized("Invalid!"));
 
             user.Token = CreateJwt(CheckUserName);
             
-            return Ok(new
+            return Task.FromResult<IActionResult>(Ok(new
             {
                 message = "Welcome Back " + CheckUserName.FirstName + " !",
                 Token = user.Token
-            });
+            }));
         }
 
         [Authorize]
         [HttpPut]
-        public IActionResult EditUser([FromForm] User userObject)
+        public Task<IActionResult> EditUser([FromForm] User userObject)
         {
             int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (id == null)
+                return Task.FromResult<IActionResult>(NotFound("UserName NotFound!"));
+
             var user = _dbContext.Users.Find(id);
+
+            if (!SecurePasswordHasherHelper.Verify(userObject.Password, user.Password))
+                return Task.FromResult<IActionResult>(Unauthorized("Invalid!"));
 
             if (userObject.FirstName != null)
                 user.FirstName = userObject.FirstName;
@@ -101,7 +107,18 @@ namespace FarzamTEWebsite.Controllers
                 user.Address = userObject.Address;
 
             _dbContext.SaveChanges();
-            return Ok("User Updated Successfully");
+            return Task.FromResult<IActionResult>(Ok("User Updated Successfully"));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public Task<IActionResult> GetUser(int id)
+        {
+            var CheckUserId = _dbContext.Users.FirstOrDefault(x => x.Id == id);
+            if (CheckUserId == null)
+                return Task.FromResult<IActionResult>(NotFound("UserName NotFound!"));
+            else
+                return Task.FromResult<IActionResult>(Ok(CheckUserId));
         }
 
         private bool CheckEmailExist(string email)
