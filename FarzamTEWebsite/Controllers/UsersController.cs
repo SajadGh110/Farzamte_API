@@ -68,7 +68,9 @@ namespace FarzamTEWebsite.Controllers
                 return Task.FromResult<IActionResult>(Unauthorized("Invalid!"));
 
             user.Token = CreateJwt(CheckUserName);
-            
+            CheckUserName.Token = user.Token;
+            _dbContext.SaveChanges();
+
             return Task.FromResult<IActionResult>(Ok(new
             {
                 message = "Welcome Back " + CheckUserName.FirstName + " !",
@@ -78,7 +80,7 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpPut]
-        public Task<IActionResult> EditUser([FromForm] User userObject)
+        public Task<IActionResult> EditUser(User userObject)
         {
             int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             if (id == null)
@@ -93,8 +95,6 @@ namespace FarzamTEWebsite.Controllers
                 user.FirstName = userObject.FirstName;
             if (userObject.LastName != null)
                 user.LastName = userObject.LastName;
-            if (userObject.UserName != null)
-                user.UserName = userObject.UserName;
             if (userObject.Email != null)
                 user.Email = userObject.Email;
             if (userObject.PhoneNumber != null)
