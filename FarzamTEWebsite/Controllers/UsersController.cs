@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace FarzamTEWebsite.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -82,10 +82,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpPut]
         public Task<IActionResult> EditUser(User userObject)
         {
-            int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            if (id == null)
-                return Task.FromResult<IActionResult>(NotFound("UserName NotFound!"));
-
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = _dbContext.Users.Find(id);
 
             if (!SecurePasswordHasherHelper.Verify(userObject.Password, user.Password))
@@ -112,13 +109,11 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> GetUser(int id)
+        public Task<IActionResult> GetUser()
         {
-            var CheckUserId = _dbContext.Users.FirstOrDefault(x => x.Id == id);
-            if (CheckUserId == null)
-                return Task.FromResult<IActionResult>(NotFound("UserName NotFound!"));
-            else
-                return Task.FromResult<IActionResult>(Ok(CheckUserId));
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _dbContext.Users.Find(id);
+            return Task.FromResult<IActionResult>(Ok(user));
         }
 
         private bool CheckEmailExist(string email)

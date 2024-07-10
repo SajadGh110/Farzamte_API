@@ -11,5 +11,6 @@ namespace FarzamTEWebsite.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<HappyCall> HappyCalls { get; set; }
     }
 }
