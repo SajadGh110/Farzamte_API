@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace FarzamTEWebsite.Controllers
             _dbContext = dbContext;
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult Total_Count(DateTime startDate, DateTime endDate)
         {
@@ -31,6 +33,7 @@ namespace FarzamTEWebsite.Controllers
             return Ok(happyCallsByDay);
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult SuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
@@ -49,6 +52,7 @@ namespace FarzamTEWebsite.Controllers
             return Ok(SuccessfulCallsByDay);
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult UnsuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
@@ -67,6 +71,7 @@ namespace FarzamTEWebsite.Controllers
             return Ok(UnsuccessfulCallsByDay);
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult All(DateTime startDate, DateTime endDate)
         {
