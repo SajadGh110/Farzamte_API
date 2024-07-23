@@ -68,6 +68,15 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpGet]
+        public IActionResult AllCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var AllCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate);
+            return Ok(AllCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
         public IActionResult SuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
             var SuccessfulCallsCount = _dbContext.HappyCalls
@@ -89,7 +98,7 @@ namespace FarzamTEWebsite.Controllers
         public IActionResult ActiveInOtherBrockers_Count(DateTime startDate, DateTime endDate)
         {
             var ActiveInOtherBrockersCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && ( hc.CustomerRequirement == "فعال در کارگزاری دیگر" || hc.CustomerRequirement1 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement2 == "فعال در کارگزاری دیگر"));
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && (hc.CustomerRequirement == "فعال در کارگزاری دیگر" || hc.CustomerRequirement1 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement2 == "فعال در کارگزاری دیگر"));
             return Ok(ActiveInOtherBrockersCount);
         }
 
@@ -100,6 +109,114 @@ namespace FarzamTEWebsite.Controllers
             var ExplanationClubCount = _dbContext.HappyCalls
                 .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.ExplanationClub == true);
             return Ok(ExplanationClubCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ActiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var ActiveSuccessfulCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Active" && hc.statusReason == "Made" );
+            return Ok(ActiveSuccessfulCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult InactiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var InactiveSuccessfulCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Inactive" && hc.statusReason == "Made");
+            return Ok(InactiveSuccessfulCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult DisinclinationCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var DisinclinationCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "disinclination");
+            return Ok(DisinclinationCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ReCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var ReCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "ReCall");
+            return Ok(ReCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult LackInfoCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var LackInfoCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Lack of information");
+            return Ok(LackInfoCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult RepeatCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var RepeatCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Repeat Call");
+            return Ok(RepeatCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult UnResponsiveCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var UnResponsiveCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "UnResponsive");
+            return Ok(UnResponsiveCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult OffCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var OffCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Off");
+            return Ok(OffCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult RejectCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var RejectCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Reject");
+            return Ok(RejectCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult UnavailableCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var UnavailableCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Unavailable");
+            return Ok(UnavailableCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult BusyCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            var BusyCallsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.statusReason == "Busy");
+            return Ok(BusyCallsCount);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult UserRequests_Count(DateTime startDate, DateTime endDate)
+        {
+            var UserRequestsCount = _dbContext.HappyCalls
+                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.UserRequest != null);
+            return Ok(UserRequestsCount);
         }
 
         [Authorize]
@@ -191,5 +308,75 @@ namespace FarzamTEWebsite.Controllers
                 .ToList();
             return Ok(AllhappyCallsByDay);
         }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ActiveIntroduction(DateTime startDate, DateTime endDate)
+        {
+            var ActiveIntroduction = _dbContext.HappyCalls
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Active")
+                .GroupBy(hc => hc.CallTo)
+                .Select(group => new { CallTo = group.Key, Introduction = group.Any(hc => hc.introduction != null) ? group.First(hc => hc.introduction != null).introduction : "نامشخص" })
+                .GroupBy(hc => hc.Introduction)
+                .Select(group => new { Introduction = group.Key, Count = group.Count() })
+                .OrderByDescending(hc => hc.Count)
+                .ToList();
+            if (ActiveIntroduction == null || !ActiveIntroduction.Any())
+                return NotFound();
+            return Ok(ActiveIntroduction);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult InactiveIntroduction(DateTime startDate, DateTime endDate)
+        {
+            var InactiveIntroduction = _dbContext.HappyCalls
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Inactive")
+                .GroupBy(hc => hc.CallTo)
+                .Select(group => new { CallTo = group.Key, Introduction = group.Any(hc => hc.introduction != null) ? group.First(hc => hc.introduction != null).introduction : "نامشخص" })
+                .GroupBy(hc => hc.Introduction)
+                .Select(group => new { Introduction = group.Key, Count = group.Count() })
+                .OrderByDescending(hc => hc.Count)
+                .ToList();
+            if (InactiveIntroduction == null || !InactiveIntroduction.Any())
+                return NotFound();
+            return Ok(InactiveIntroduction);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ActiveChoosingBrokerage(DateTime startDate, DateTime endDate)
+        {
+            var ActiveChoosingBrokerage = _dbContext.HappyCalls
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Active")
+                .GroupBy(hc => hc.CallTo)
+                .Select(group => new { CallTo = group.Key, ChoosingBrokerage = group.Any(hc => hc.ChoosingBrokerage != null) ? group.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
+                .GroupBy(hc => hc.ChoosingBrokerage)
+                .Select(group => new { ChoosingBrokerage = group.Key, Count = group.Count() })
+                .OrderByDescending(hc => hc.Count)
+                .ToList();
+            if (ActiveChoosingBrokerage == null || !ActiveChoosingBrokerage.Any())
+                return NotFound();
+            return Ok(ActiveChoosingBrokerage);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult InactiveChoosingBrokerage(DateTime startDate, DateTime endDate)
+        {
+            var InactiveChoosingBrokerage = _dbContext.HappyCalls
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.TradeStatus == "Inactive")
+                .GroupBy(hc => hc.CallTo)
+                .Select(group => new { CallTo = group.Key, ChoosingBrokerage = group.Any(hc => hc.ChoosingBrokerage != null) ? group.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
+                .GroupBy(hc => hc.ChoosingBrokerage)
+                .Select(group => new { ChoosingBrokerage = group.Key, Count = group.Count() })
+                .OrderByDescending(hc => hc.Count)
+                .ToList();
+            if (InactiveChoosingBrokerage == null || !InactiveChoosingBrokerage.Any())
+                return NotFound();
+            return Ok(InactiveChoosingBrokerage);
+        }
+
+
     }
 }
