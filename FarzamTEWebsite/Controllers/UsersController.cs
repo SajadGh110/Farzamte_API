@@ -27,14 +27,10 @@ namespace FarzamTEWebsite.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] User user)
         {
-            if (user.FirstName == null)
-                return BadRequest("FirstName is Required!");
-            if (user.LastName == null)
-                return BadRequest("LastName is Required!");
-
-            if (CheckUserNameExist(user.UserName))
-                return BadRequest("User With Same UserName Already Exists!");
-
+            if (user.FirstName == null) return BadRequest("FirstName is Required!");
+            if (user.LastName == null) return BadRequest("LastName is Required!");
+            if (user.Broker == null) return BadRequest("Broker is Required!");
+            if (CheckUserNameExist(user.UserName)) return BadRequest("User With Same UserName Already Exists!");
             if (user.Email != null)
                 if (CheckEmailExist(user.Email))
                     return BadRequest("User With Same Email Already Exists!");
@@ -50,8 +46,15 @@ namespace FarzamTEWebsite.Controllers
                 Password = SecurePasswordHasherHelper.Hash(user.Password),
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Role = "Normal",
+                Broker = user.Broker,
+                Role = "Normal"
             };
+
+            if (user.PhoneNumber != null) UserObject.PhoneNumber = user.PhoneNumber;
+            if (user.City != null) UserObject.City = user.City;
+            if (user.Address != null) UserObject.Address = user.Address;
+            if (user.PostalCode != null) UserObject.PostalCode = user.PostalCode;
+
             _dbContext.Users.Add(UserObject);
             _dbContext.SaveChanges();
             return Ok("New User Created Successfully");
@@ -92,8 +95,15 @@ namespace FarzamTEWebsite.Controllers
                 user.FirstName = userObject.FirstName;
             if (userObject.LastName != null)
                 user.LastName = userObject.LastName;
+            if (userObject.Broker != null && user.Role == "Owner")
+                user.Broker = userObject.Broker;
             if (userObject.Email != null)
-                user.Email = userObject.Email;
+            {
+                if (userObject.Email != user.Email && CheckEmailExist(userObject.Email))
+                    return Task.FromResult<IActionResult>(BadRequest("User With Same Email Already Exists!"));
+                else
+                    user.Email = userObject.Email;
+            }
             if (userObject.PhoneNumber != null)
                 user.PhoneNumber = userObject.PhoneNumber;
             if (userObject.City != null)
@@ -114,6 +124,26 @@ namespace FarzamTEWebsite.Controllers
             int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = _dbContext.Users.Find(id);
             return Task.FromResult<IActionResult>(Ok(user));
+        }
+
+        [Authorize]
+        [HttpPut]
+        public Task<IActionResult> ChangePassword(ChangePassword userObject)
+        {
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _dbContext.Users.Find(id);
+
+            if (!SecurePasswordHasherHelper.Verify(userObject.Password, user.Password))
+                return Task.FromResult<IActionResult>(Unauthorized("Invalid!"));
+
+            string passcheck = CheckPasswordStrenght(userObject.New_Password);
+            if (!string.IsNullOrEmpty(passcheck))
+                return Task.FromResult<IActionResult>(BadRequest(passcheck));
+
+            user.Password = SecurePasswordHasherHelper.Hash(userObject.New_Password);
+
+            _dbContext.SaveChanges();
+            return Task.FromResult<IActionResult>(Ok("Your Password Updated Successfully"));
         }
 
         private bool CheckEmailExist(string email)
@@ -153,6 +183,7 @@ namespace FarzamTEWebsite.Controllers
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.PrimarySid, user.Broker)
             });
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
             var tokenDescriptor = new SecurityTokenDescriptor

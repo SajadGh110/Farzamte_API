@@ -10,6 +10,7 @@ namespace FarzamTEWebsite.Models
         public required string TradeStatus { get; set; }
         public required string statusReason { get; set; }
         public required string nationalCode { get; set; }
+        public required string Broker { get; set; }
         public string? phonenumber { get; set; }
         public required DateTime createdon { get; set; }
         public required DateTime RegDate { get; set; }

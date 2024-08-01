@@ -11,6 +11,7 @@ namespace FarzamTEWebsite.Models
         public required string UserName { get; set; }
         [Required(ErrorMessage = "Password is Required!")]
         public required string Password { get; set; }
+        public string Broker {  get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? City { get; set;}
