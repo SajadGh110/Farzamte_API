@@ -1,14 +1,14 @@
 ﻿using FarzamTEWebsite.Data;
-using FarzamTEWebsite.Migrations;
-using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace FarzamTEWebsite.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
+    [Authorize(Policy = "AdminPolicy")]
     public class HappyCallController : ControllerBase
     {
         private IConfiguration _configuration;
@@ -21,233 +21,377 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> Customers_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Date()
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+
+            var uniqueDates = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.Broker == Broker)
+                .Select(hc => hc.createdon.Date)
+                .Distinct()
+                .OrderByDescending(date => date)
+                .Take(30)
+                .ToListAsync();
+
+            if (uniqueDates.Count == 0)
+                return NotFound("No records found.");
+
+            return Ok(new { StartDate = uniqueDates.Last().ToString("yyyy-MM-dd") , LastDate = uniqueDates.First().ToString("yyyy-MM-dd") });
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Customers_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var CustomersCount = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
                 .GroupBy(hc => hc.CallTo)
                 .Count();
-            return Task.FromResult<IActionResult>(Ok(CustomersCount));
+            return Ok(CustomersCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> UniqueCustomers(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Customers_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var UniqueCustomers = _dbContext.HappyCalls
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
-                .Select(hc => hc.CallTo)
-                .Distinct()
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var CustomersList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
                 .ToList();
-            if (UniqueCustomers == null)
-                return Task.FromResult<IActionResult>(NotFound());
-            return Task.FromResult<IActionResult>(Ok(UniqueCustomers));
+            return Ok(CustomersList);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> Active_Customers_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Active_Customers_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ActiveCustomersCount = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active")
                 .Select(hc => hc.CallTo)
                 .Distinct()
                 .Count();
-            return Task.FromResult<IActionResult>(Ok(ActiveCustomersCount));
+            return Ok(ActiveCustomersCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> Inactive_Customers_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Active_Customers_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active")
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var ActiveCustomersList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(ActiveCustomersList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Inactive_Customers_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var InactiveCustomersCount = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive")
                 .Select(hc => hc.CallTo)
                 .Distinct()
                 .Count();
-            return Task.FromResult<IActionResult>(Ok(InactiveCustomersCount));
+            return Ok(InactiveCustomersCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> AllCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Inactive_Customers_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive")
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var InactiveCustomersList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(InactiveCustomersList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> AllCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var AllCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker);
-            return Task.FromResult<IActionResult>(Ok(AllCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker);
+            return Ok(AllCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> SuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var SuccessfulCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Made");
-            return Task.FromResult<IActionResult>(Ok(SuccessfulCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Made");
+            return Ok(SuccessfulCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> ActiveAfterCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SuccessfulCalls_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Made")
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var SuccessfulCallsList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(SuccessfulCallsList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ActiveAfterCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ActiveAfterCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive" && hc.TradeStatusAffter == "Active");
-            return Task.FromResult<IActionResult>(Ok(ActiveAfterCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive" && hc.TradeStatusAffter == "Active");
+            return Ok(ActiveAfterCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> ActiveInOtherBrockers_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ActiveAfterCalls_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive" && hc.TradeStatusAffter == "Active")
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var ActiveAfterCallsList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(ActiveAfterCallsList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ActiveInOtherBrockers_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ActiveInOtherBrockersCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && (hc.CustomerRequirement == "فعال در کارگزاری دیگر" || hc.CustomerRequirement1 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement2 == "فعال در کارگزاری دیگر"));
-            return Task.FromResult<IActionResult>(Ok(ActiveInOtherBrockersCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && (hc.CustomerRequirement == "فعال در کارگزاری دیگر" || hc.CustomerRequirement1 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement2 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement3 == "فعال در کارگزاری دیگر"));
+            return Ok(ActiveInOtherBrockersCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> ExplanationClub_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ActiveInOtherBrockers_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && (hc.CustomerRequirement == "فعال در کارگزاری دیگر" || hc.CustomerRequirement1 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement2 == "فعال در کارگزاری دیگر" || hc.CustomerRequirement3 == "فعال در کارگزاری دیگر"))
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var ActiveInOtherBrockersList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(ActiveInOtherBrockersList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ExplanationClub_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ExplanationClubCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.ExplanationClub == true);
-            return Task.FromResult<IActionResult>(Ok(ExplanationClubCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.ExplanationClub == true);
+            return Ok(ExplanationClubCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> ActiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ExplanationClub_List(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var filteredCustomers = await _dbContext.HappyCalls
+                .AsNoTracking()
+                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.ExplanationClub == true)
+                .Select(hc => new
+                {
+                    hc.CallTo,
+                    hc.RegDate
+                })
+                .ToListAsync();
+            var ExplanationClubList = filteredCustomers
+                .GroupBy(hc => new { hc.CallTo, hc.RegDate })
+                .Select(g => new
+                {
+                    Customer = g.Key.CallTo,
+                    Reg_Date = g.Key.RegDate,
+                    CallCount = g.Count()
+                })
+                .ToList();
+            return Ok(ExplanationClubList);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ActiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ActiveSuccessfulCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active" && hc.statusReason == "Made" );
-            return Task.FromResult<IActionResult>(Ok(ActiveSuccessfulCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active" && hc.statusReason == "Made" );
+            return Ok(ActiveSuccessfulCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> InactiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> InactiveSuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var InactiveSuccessfulCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive" && hc.statusReason == "Made");
-            return Task.FromResult<IActionResult>(Ok(InactiveSuccessfulCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive" && hc.statusReason == "Made");
+            return Ok(InactiveSuccessfulCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> DisinclinationCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> UnsuccessfulCalls_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var DisinclinationCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "disinclination");
-            return Task.FromResult<IActionResult>(Ok(DisinclinationCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> ReCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ReCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "ReCall");
-            return Task.FromResult<IActionResult>(Ok(ReCallsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Unsuccessful");
+            return Ok(ReCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> LackInfoCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ReCalls_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var LackInfoCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Lack of information");
-            return Task.FromResult<IActionResult>(Ok(LackInfoCallsCount));
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var ReCallsCount = _dbContext.HappyCalls
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "ReCall");
+            return Ok(ReCallsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> RepeatCalls_Count(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> UserRequests_Count(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var RepeatCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Repeat Call");
-            return Task.FromResult<IActionResult>(Ok(RepeatCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> UnResponsiveCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var UnResponsiveCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "UnResponsive");
-            return Task.FromResult<IActionResult>(Ok(UnResponsiveCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> OffCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var OffCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Off");
-            return Task.FromResult<IActionResult>(Ok(OffCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> RejectCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var RejectCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Reject");
-            return Task.FromResult<IActionResult>(Ok(RejectCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> UnavailableCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var UnavailableCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Unavailable");
-            return Task.FromResult<IActionResult>(Ok(UnavailableCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> BusyCalls_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var BusyCallsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.statusReason == "Busy");
-            return Task.FromResult<IActionResult>(Ok(BusyCallsCount));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> UserRequests_Count(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var UserRequestsCount = _dbContext.HappyCalls
-                .Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.UserRequest != null);
-            return Task.FromResult<IActionResult>(Ok(UserRequestsCount));
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.UserRequest != null);
+            return Ok(UserRequestsCount);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> Total_Count_Day(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Total_Count_Day(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var happyCallsByDay = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
                 .GroupBy(hc => hc.createdon.Date)
                 .Select(g => new { Date = g.Key, Count = g.Count() })
@@ -255,15 +399,17 @@ namespace FarzamTEWebsite.Controllers
                 .Select(g => new { Date = g.Date.ToString("yyyy-MM-dd"), g.Count })
                 .OrderBy(hc => hc.Date)
                 .ToList();
-            return Task.FromResult<IActionResult>(Ok(happyCallsByDay));
+            return Ok(happyCallsByDay);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> SuccessfulCalls_Count_Day(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SuccessfulCalls_Count_Day(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var SuccessfulCallsByDay = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
                 .GroupBy(hc => hc.createdon.Date)
                 .Select(g => new
@@ -275,138 +421,121 @@ namespace FarzamTEWebsite.Controllers
                 .Select(g => new { Date = g.Date.ToString("yyyy-MM-dd"), g.Count })
                 .OrderBy(hc => hc.Date)
                 .ToList();
-            return Task.FromResult<IActionResult>(Ok(SuccessfulCallsByDay));
+            return Ok(SuccessfulCallsByDay);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> UnsuccessfulCalls_Count_Day(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> UnsuccessfulCalls_Count_Day(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var UnsuccessfulCallsByDay = _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
                 .GroupBy(hc => hc.createdon.Date)
                 .Select(g => new
                 {
                     Date = g.Key,
-                    Count = g.Count(h => h.statusReason != "Made") == 0 ? 0 : g.Count(h => h.statusReason != "Made")
+                    Count = g.Count(h => h.statusReason == "Unsuccessful") == 0 ? 0 : g.Count(h => h.statusReason == "Unsuccessful")
                 })
                 .AsEnumerable()
                 .Select(g => new { Date = g.Date.ToString("yyyy-MM-dd"), g.Count })
                 .OrderBy(hc => hc.Date)
                 .ToList();
-            return Task.FromResult<IActionResult>(Ok(UnsuccessfulCallsByDay));
+            return Ok(UnsuccessfulCallsByDay);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> All(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ActiveIntroduction(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var AllhappyCallsByDay = _dbContext.HappyCalls
-                .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker)
-                .OrderBy(hc => hc.createdon)
-                .Select(hc => new
-                {
-                    hc.Id,
-                    hc.CallTo,
-                    hc.CallFrom,
-                    hc.statusReason,
-                    hc.nationalCode,
-                    hc.Broker,
-                    hc.phonenumber,
-                    hc.introduction,
-                    hc.ChoosingBrokerage,
-                    hc.ExplanationClub,
-                    hc.UserRequest,
-                    hc.checkingPanel,
-                    hc.CustomerRequirement,
-                    hc.CustomerRequirementDesc,
-                    hc.CustomerRequirement1,
-                    hc.CustomerRequirementDesc1,
-                    hc.CustomerRequirement2,
-                    hc.CustomerRequirementDesc2,
-                    hc.TradeStatus,
-                    hc.TradeStatusAffter,
-                    hc.TotalTradeAmount,
-                    hc.totalBrokerCommission,
-                    RegisterDate = hc.RegDate.ToString("yyyy-MM-dd"),
-                    CreateDate = hc.createdon.ToString("yyyy-MM-dd")
-                })
-                .ToList();
-            return Task.FromResult<IActionResult>(Ok(AllhappyCallsByDay));
-        }
-
-        [Authorize]
-        [HttpGet]
-        public Task<IActionResult> ActiveIntroduction(DateTime startDate, DateTime endDate)
-        {
-            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var ActiveIntroduction = _dbContext.HappyCalls
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var Customers_Calls = await _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active")
                 .GroupBy(hc => hc.CallTo)
-                .Select(group => new { CallTo = group.Key, Introduction = group.Any(hc => hc.introduction != null) ? group.First(hc => hc.introduction != null).introduction : "نامشخص" })
+                .Select(group => new { CallTo = group.Key, Calls = group.ToList() })
+                .ToListAsync();
+            if (!Customers_Calls.Any())
+                return Ok(Customers_Calls);
+            var ActiveIntroduction_Count = Customers_Calls
+                .Select(group => new { Introduction = group.Calls.Any(hc => hc.introduction != null) ? group.Calls.First(hc => hc.introduction != null).introduction : "نامشخص" })
                 .GroupBy(hc => hc.Introduction)
                 .Select(group => new { Introduction = group.Key, Count = group.Count() })
                 .OrderByDescending(hc => hc.Count)
                 .ToList();
-            if (ActiveIntroduction == null || !ActiveIntroduction.Any())
-                return Task.FromResult<IActionResult>(NotFound());
-            return Task.FromResult<IActionResult>(Ok(ActiveIntroduction));
+            return Ok(ActiveIntroduction_Count);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> InactiveIntroduction(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> InactiveIntroduction(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var InactiveIntroduction = _dbContext.HappyCalls
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var Customers_Calls = await _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive")
                 .GroupBy(hc => hc.CallTo)
-                .Select(group => new { CallTo = group.Key, Introduction = group.Any(hc => hc.introduction != null) ? group.First(hc => hc.introduction != null).introduction : "نامشخص" })
+                .Select(group => new { CallTo = group.Key, Calls = group.ToList() })
+                .ToListAsync();
+            if (!Customers_Calls.Any())
+                return Ok(Customers_Calls);
+            var InactiveIntroduction_Count = Customers_Calls
+                .Select(group => new { Introduction = group.Calls.Any(hc => hc.introduction != null) ? group.Calls.First(hc => hc.introduction != null).introduction : "نامشخص" })
                 .GroupBy(hc => hc.Introduction)
                 .Select(group => new { Introduction = group.Key, Count = group.Count() })
                 .OrderByDescending(hc => hc.Count)
                 .ToList();
-            if (InactiveIntroduction == null || !InactiveIntroduction.Any())
-                return Task.FromResult<IActionResult>(NotFound());
-            return Task.FromResult<IActionResult>(Ok(InactiveIntroduction));
+            return Ok(InactiveIntroduction_Count);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> ActiveChoosingBrokerage(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> ActiveChoosingBrokerage(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var ActiveChoosingBrokerage = _dbContext.HappyCalls
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var Customers_Calls = await _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active")
                 .GroupBy(hc => hc.CallTo)
-                .Select(group => new { CallTo = group.Key, ChoosingBrokerage = group.Any(hc => hc.ChoosingBrokerage != null) ? group.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
+                .Select(group => new { CallTo = group.Key, Calls = group.ToList() })
+                .ToListAsync();
+            if (!Customers_Calls.Any())
+                return Ok(Customers_Calls);
+            var ActiveChoosingBrokerage_Count = Customers_Calls
+                .Select(group => new { ChoosingBrokerage = group.Calls.Any(hc => hc.ChoosingBrokerage != null) ? group.Calls.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
                 .GroupBy(hc => hc.ChoosingBrokerage)
                 .Select(group => new { ChoosingBrokerage = group.Key, Count = group.Count() })
                 .OrderByDescending(hc => hc.Count)
                 .ToList();
-            if (ActiveChoosingBrokerage == null || !ActiveChoosingBrokerage.Any())
-                return Task.FromResult<IActionResult>(NotFound());
-            return Task.FromResult<IActionResult>(Ok(ActiveChoosingBrokerage));
+            return Ok(ActiveChoosingBrokerage_Count);
         }
 
         [Authorize]
         [HttpGet]
-        public Task<IActionResult> InactiveChoosingBrokerage(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> InactiveChoosingBrokerage(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var InactiveChoosingBrokerage = _dbContext.HappyCalls
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+            var Customers_Calls = await _dbContext.HappyCalls
+                .AsNoTracking()
                 .Where(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Inactive")
                 .GroupBy(hc => hc.CallTo)
-                .Select(group => new { CallTo = group.Key, ChoosingBrokerage = group.Any(hc => hc.ChoosingBrokerage != null) ? group.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
+                .Select(group => new { CallTo = group.Key, Calls = group.ToList() })
+                .ToListAsync();
+            if (!Customers_Calls.Any())
+                return Ok(Customers_Calls);
+            var ActiveChoosingBrokerage_Count = Customers_Calls
+                .Select(group => new { ChoosingBrokerage = group.Calls.Any(hc => hc.ChoosingBrokerage != null) ? group.Calls.First(hc => hc.ChoosingBrokerage != null).ChoosingBrokerage : "نامشخص" })
                 .GroupBy(hc => hc.ChoosingBrokerage)
                 .Select(group => new { ChoosingBrokerage = group.Key, Count = group.Count() })
                 .OrderByDescending(hc => hc.Count)
                 .ToList();
-            if (InactiveChoosingBrokerage == null || !InactiveChoosingBrokerage.Any())
-                return Task.FromResult<IActionResult>(NotFound());
-            return Task.FromResult<IActionResult>(Ok(InactiveChoosingBrokerage));
+            return Ok(ActiveChoosingBrokerage_Count);
         }
     }
 }

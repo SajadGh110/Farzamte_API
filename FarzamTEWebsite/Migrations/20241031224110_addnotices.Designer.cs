@@ -4,6 +4,7 @@ using FarzamTEWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    partial class FarzamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241031224110_addnotices")]
+    partial class addnotices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,6 +283,7 @@ namespace FarzamTEWebsite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("company")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("createdon")
@@ -301,12 +305,15 @@ namespace FarzamTEWebsite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("noticetype")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("statusReason")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("symbol")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("typeofcapitalincrease")
@@ -330,6 +337,7 @@ namespace FarzamTEWebsite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("company")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("description")
@@ -349,15 +357,19 @@ namespace FarzamTEWebsite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("noticetype")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("response_id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("symbol")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("typeofcapitalincrease")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");

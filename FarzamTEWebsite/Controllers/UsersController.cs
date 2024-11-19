@@ -24,9 +24,12 @@ namespace FarzamTEWebsite.Controllers
             _dbContext = dbContext;
         }
 
+        [Authorize(Policy = "OwnerPolicy")]
         [HttpPost]
-        public IActionResult Register([FromBody] User user)
+        public IActionResult Register(User user)
         {
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var u = _dbContext.Users.Find(id);
             if (user.FirstName == null) return BadRequest("FirstName is Required!");
             if (user.LastName == null) return BadRequest("LastName is Required!");
             if (user.Broker == null) return BadRequest("Broker is Required!");
@@ -49,6 +52,22 @@ namespace FarzamTEWebsite.Controllers
                 Broker = user.Broker,
                 Role = "Normal"
             };
+
+            switch (user.Broker)
+            {
+                case "Mobin":
+                    UserObject.Brokerage_ID = 104;
+                    break;
+                case "Pishro":
+                    UserObject.Brokerage_ID = 10;
+                    break;
+                case "Pouyan":
+                    UserObject.Brokerage_ID = 53;
+                    break;
+                case "Khobregan":
+                    UserObject.Brokerage_ID = 70;
+                    break;
+            }
 
             if (user.PhoneNumber != null) UserObject.PhoneNumber = user.PhoneNumber;
             if (user.City != null) UserObject.City = user.City;
@@ -96,7 +115,25 @@ namespace FarzamTEWebsite.Controllers
             if (userObject.LastName != null)
                 user.LastName = userObject.LastName;
             if (userObject.Broker != null && user.Role == "Owner")
+            {
                 user.Broker = userObject.Broker;
+                switch (user.Broker)
+                {
+                    case "Mobin":
+                        user.Brokerage_ID = 104;
+                        break;
+                    case "Pishro":
+                        user.Brokerage_ID = 10;
+                        break;
+                    case "Pouyan":
+                        user.Brokerage_ID = 53;
+                        break;
+                    case "Khobregan":
+                        user.Brokerage_ID = 70;
+                        break;
+                }
+            }
+                
             if (userObject.Email != null)
             {
                 if (userObject.Email != user.Email && CheckEmailExist(userObject.Email))

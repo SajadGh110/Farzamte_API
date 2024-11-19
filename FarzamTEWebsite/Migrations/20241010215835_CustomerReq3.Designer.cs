@@ -4,6 +4,7 @@ using FarzamTEWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    partial class FarzamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010215835_CustomerReq3")]
+    partial class CustomerReq3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +33,8 @@ namespace FarzamTEWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Logo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Code")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -41,77 +43,6 @@ namespace FarzamTEWebsite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Brokerages");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.CaseReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CaseResolutionCreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CaseResolutionDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CaseResolutionSubject")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CaseResolutionsolver")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("caseAutoNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("casetype")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("createdon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("owner")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("phonecallReason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("phonecallReasonsDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("statuscode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CaseReports");
                 });
 
             modelBuilder.Entity("FarzamTEWebsite.Models.HappyCall", b =>
@@ -267,131 +198,6 @@ namespace FarzamTEWebsite.Migrations
                     b.ToTable("InComingCalls");
                 });
 
-            modelBuilder.Entity("FarzamTEWebsite.Models.Notice_Call", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("company")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("createdon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("expert")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticeid")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticetype")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("statusReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("typeofcapitalincrease")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Notice_Call");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.Notice_SMS", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("company")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("expert")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("modifiedon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("noticeid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticetype")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("response_id")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("typeofcapitalincrease")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Notice_SMS");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.TTS_Reason", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("TransportToSmartId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TransportToSmartId1")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransportToSmartId");
-
-                    b.HasIndex("TransportToSmartId1");
-
-                    b.ToTable("TTS_Reasons");
-                });
-
             modelBuilder.Entity("FarzamTEWebsite.Models.Transaction_Statistics_M", b =>
                 {
                     b.Property<int>("Id")
@@ -492,53 +298,6 @@ namespace FarzamTEWebsite.Migrations
                     b.ToTable("Transaction_Statistics_M");
                 });
 
-            modelBuilder.Entity("FarzamTEWebsite.Models.TransportToSmart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("createdon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("customerSatisfaction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("from")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("nationalCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("phonenumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("resultOfCall")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("to")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransportsToSmart");
-                });
-
             modelBuilder.Entity("FarzamTEWebsite.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -593,24 +352,6 @@ namespace FarzamTEWebsite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.TTS_Reason", b =>
-                {
-                    b.HasOne("FarzamTEWebsite.Models.TransportToSmart", null)
-                        .WithMany("reasonOfContinueSmart")
-                        .HasForeignKey("TransportToSmartId");
-
-                    b.HasOne("FarzamTEWebsite.Models.TransportToSmart", null)
-                        .WithMany("reasonOfReturnTadbir")
-                        .HasForeignKey("TransportToSmartId1");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.TransportToSmart", b =>
-                {
-                    b.Navigation("reasonOfContinueSmart");
-
-                    b.Navigation("reasonOfReturnTadbir");
                 });
 #pragma warning restore 612, 618
         }

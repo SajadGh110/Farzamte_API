@@ -25,6 +25,8 @@ namespace FarzamTEWebsite.Models
         public string? CustomerRequirementDesc1 { get; set; }
         public string? CustomerRequirement2 { get; set; }
         public string? CustomerRequirementDesc2 { get; set; }
+        public string? CustomerRequirement3 { get; set; }
+        public string? CustomerRequirementDesc3 { get; set; }
         public string? TradeStatusAffter { get; set; }
         public string? TotalTradeAmount { get; set; }
         public string? totalBrokerCommission { get; set; }

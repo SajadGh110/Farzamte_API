@@ -4,6 +4,7 @@ using FarzamTEWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    partial class FarzamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241026205944_brokerages_changes")]
+    partial class brokerages_changes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,104 +268,6 @@ namespace FarzamTEWebsite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InComingCalls");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.Notice_Call", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("company")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("createdon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("expert")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticeid")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticetype")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("statusReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("typeofcapitalincrease")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Notice_Call");
-                });
-
-            modelBuilder.Entity("FarzamTEWebsite.Models.Notice_SMS", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("company")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("expert")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("modifiedon")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("noticeid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("noticetype")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("response_id")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("typeofcapitalincrease")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Notice_SMS");
                 });
 
             modelBuilder.Entity("FarzamTEWebsite.Models.TTS_Reason", b =>

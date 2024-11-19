@@ -1,8 +1,11 @@
 using FarzamTEWebsite.Data;
 using FarzamTEWebsite.Filters;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +22,18 @@ builder.Services.AddControllers(option =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddSwaggerGen();
+
+// Add Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => (c.Type == ClaimTypes.Role && (c.Value == "Owner" || c.Value == "Admin")))));
+
+    options.AddPolicy("OwnerPolicy", policy =>
+        policy.RequireClaim(ClaimTypes.Role, "Owner"));
+});
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,13 +72,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseDeveloperExceptionPage();
 app.UseCors();
-
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
