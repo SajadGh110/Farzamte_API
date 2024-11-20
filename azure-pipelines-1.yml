@@ -1,0 +1,51 @@
+trigger:
+- main
+
+pool:
+  name: 'FarzamAgent'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: DeleteFiles@1
+  inputs:
+    SourceFolder: 'C:\Farzamte\api'
+    Contents: '**/*'
+  displayName: 'Delete old files'
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.ArtifactStagingDirectory)'
+    contents: '**/*'
+    targetFolder: 'C:\Farzamte\api'
+  displayName: 'Copy files to destination'
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: 'C:\Farzamte\api_need'
+    contents: 'appsettings.json'
+    targetFolder: 'C:\Farzamte\api'
+    CleanTargetFolder: false
+    OverWrite: true
+  displayName: 'Copy and replace appsettings.json'
