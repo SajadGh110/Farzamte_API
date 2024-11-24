@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace FarzamTEWebsite.Controllers
 {
@@ -58,7 +57,8 @@ namespace FarzamTEWebsite.Controllers
             var brokerage = await _dbContext.Transaction_Statistics_M
                 .AsNoTracking()
                 .Where(t => t.Date_Monthly == Date_Monthly && t.Brokerage_ID == id)
-                .Select(t => new {
+                .Select(t => new
+                {
                     BOBT = t.BOBT_Total_Value,
                     FI = t.FI_Total_Value,
                     BKI = t.BKI_Total_Value,

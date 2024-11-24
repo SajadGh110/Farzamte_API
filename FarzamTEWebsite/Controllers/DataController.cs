@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FarzamTEWebsite.Data;
-using System.Text;
-using Newtonsoft.Json;
+﻿using FarzamTEWebsite.Data;
 using FarzamTEWebsite.Models;
-using System.Text.RegularExpressions;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Security.Claims;
-
+using System.Text;
+using System.Text.RegularExpressions;
 
 
 namespace FarzamTEWebsite.Controllers
@@ -459,7 +457,7 @@ namespace FarzamTEWebsite.Controllers
                                 _dbContext.TTS_Reasons.Add(reason);
 
                         if (TransportToSmart.reasonOfReturnTadbir != null)
-                            foreach (var reason in TransportToSmart.reasonOfReturnTadbir) 
+                            foreach (var reason in TransportToSmart.reasonOfReturnTadbir)
                                 _dbContext.TTS_Reasons.Add(reason);
                     }
                     _dbContext.TransportsToSmart.AddRange(TransportToSmartObjects);
@@ -759,7 +757,7 @@ namespace FarzamTEWebsite.Controllers
             var u = _dbContext.Users.Find(id);
             if (u.Role != "Owner")
                 return BadRequest("Access Denied!");
-            if (brokerage.Name.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(brokerage.Name))
                 return BadRequest("Name Requierd!");
             else
             {

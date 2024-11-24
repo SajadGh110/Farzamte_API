@@ -133,7 +133,7 @@ namespace FarzamTEWebsite.Controllers
                         break;
                 }
             }
-                
+
             if (userObject.Email != null)
             {
                 if (userObject.Email != user.Email && CheckEmailExist(userObject.Email))
@@ -232,6 +232,6 @@ namespace FarzamTEWebsite.Controllers
             var token = JwtTokenHandler.CreateToken(tokenDescriptor);
             return JwtTokenHandler.WriteToken(token);
         }
-        
+
     }
 }

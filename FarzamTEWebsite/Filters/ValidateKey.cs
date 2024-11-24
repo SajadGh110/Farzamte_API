@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.IdentityModel.Tokens;
 
 namespace FarzamTEWebsite.Filters
 {
@@ -15,7 +14,7 @@ namespace FarzamTEWebsite.Filters
         public override void OnResultExecuting(ResultExecutingContext context)
         {
             string api_key = context.HttpContext.Request.Headers["api-key"].ToString();
-            if (api_key.IsNullOrEmpty() || api_key != _key)
+            if (String.IsNullOrEmpty(api_key) || api_key != _key)
                 context.Result = new BadRequestObjectResult("You Don't Have a Permission to Access This Api");
             base.OnResultExecuting(context);
         }

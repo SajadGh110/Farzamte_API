@@ -69,7 +69,8 @@ namespace FarzamTEWebsite.Controllers
             var brokerage = await _dbContext.Transaction_Statistics_M
                 .AsNoTracking()
                 .Where(t => t.Date_Monthly == Date_Monthly && t.Brokerage_ID == u.Brokerage_ID)
-                .Select(t => new {
+                .Select(t => new
+                {
                     BOBT = t.BOBT_Total_Value,
                     FI = t.FI_Total_Value,
                     BKI = t.BKI_Total_Value,
@@ -87,9 +88,9 @@ namespace FarzamTEWebsite.Controllers
             return Ok(new
             {
                 date = Date_Monthly,
-                bobt_share = (float)Math.Round(bobt_share,2),
-                fi_share = (float)Math.Round(fi_share,2),
-                bobt_fi_share = (float)Math.Round(bobt_share+fi_share,2),
+                bobt_share = (float)Math.Round(bobt_share, 2),
+                fi_share = (float)Math.Round(fi_share, 2),
+                bobt_fi_share = (float)Math.Round(bobt_share + fi_share, 2),
                 bki_share = (float)Math.Round(bki_share, 2),
                 bei_share = (float)Math.Round(bei_share, 2),
                 all_share = (float)Math.Round(all_share, 2)

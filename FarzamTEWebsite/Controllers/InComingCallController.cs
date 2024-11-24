@@ -177,8 +177,8 @@ namespace FarzamTEWebsite.Controllers
             endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var selected_fields = await _dbContext.InComingCalls
                 .AsNoTracking()
-                .Where(inc => inc.createdon >= startDate && inc.createdon <= endDate && inc.Broker == Broker && inc.description != "NULL" && inc.description != null && ( inc.phonecallreasondetail == Detail || inc.phonecallreasondetail2 == Detail || inc.phonecallreasondetail3 == Detail))
-                .Select(inc => new { inc.fullName, inc.phonenumber, inc.description})
+                .Where(inc => inc.createdon >= startDate && inc.createdon <= endDate && inc.Broker == Broker && inc.description != "NULL" && inc.description != null && (inc.phonecallreasondetail == Detail || inc.phonecallreasondetail2 == Detail || inc.phonecallreasondetail3 == Detail))
+                .Select(inc => new { inc.fullName, inc.phonenumber, inc.description })
                 .ToListAsync();
             return Ok(selected_fields);
         }

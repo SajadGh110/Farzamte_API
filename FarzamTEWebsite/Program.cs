@@ -1,8 +1,6 @@
 using FarzamTEWebsite.Data;
 using FarzamTEWebsite.Filters;
-using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -57,7 +55,7 @@ builder.Services.AddDbContext<FarzamDbContext>(options => options.UseSqlServer(c
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>  policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 var app = builder.Build();
@@ -65,7 +63,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    
+
 }
 
 app.UseSwagger();

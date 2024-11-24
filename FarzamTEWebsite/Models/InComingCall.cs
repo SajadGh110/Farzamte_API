@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FarzamTEWebsite.Models
+﻿namespace FarzamTEWebsite.Models
 {
     public class InComingCall
     {

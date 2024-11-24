@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace FarzamTEWebsite.Models
+﻿namespace FarzamTEWebsite.Models
 {
     public class CaseReport
     {

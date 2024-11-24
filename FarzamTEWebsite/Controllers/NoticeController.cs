@@ -172,7 +172,7 @@ namespace FarzamTEWebsite.Controllers
             var Noticetype = await _dbContext.Notice_SMS
                 .AsNoTracking()
                 .Where(n => n.modifiedon >= startDate && n.modifiedon <= endDate && n.Broker == Broker && n.typeofcapitalincrease != null && n.typeofcapitalincrease != "NULL")
-                .Select(n => n.typeofcapitalincrease )
+                .Select(n => n.typeofcapitalincrease)
                 .GroupBy(n => n)
                 .Select(group => new { Name = group.Key, Count = group.Count() })
                 .ToListAsync();

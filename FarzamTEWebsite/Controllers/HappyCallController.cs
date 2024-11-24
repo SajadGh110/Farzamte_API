@@ -37,7 +37,7 @@ namespace FarzamTEWebsite.Controllers
             if (uniqueDates.Count == 0)
                 return NotFound("No records found.");
 
-            return Ok(new { StartDate = uniqueDates.Last().ToString("yyyy-MM-dd") , LastDate = uniqueDates.First().ToString("yyyy-MM-dd") });
+            return Ok(new { StartDate = uniqueDates.Last().ToString("yyyy-MM-dd"), LastDate = uniqueDates.First().ToString("yyyy-MM-dd") });
         }
 
 
@@ -336,7 +336,7 @@ namespace FarzamTEWebsite.Controllers
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
             endDate = endDate.Date.AddDays(1).AddTicks(-1);
             var ActiveSuccessfulCallsCount = _dbContext.HappyCalls
-                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active" && hc.statusReason == "Made" );
+                .AsNoTracking().Count(hc => hc.createdon >= startDate && hc.createdon <= endDate && hc.Broker == Broker && hc.TradeStatus == "Active" && hc.statusReason == "Made");
             return Ok(ActiveSuccessfulCallsCount);
         }
 

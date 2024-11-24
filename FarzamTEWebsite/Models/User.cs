@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FarzamTEWebsite.Models
 {
@@ -12,11 +11,11 @@ namespace FarzamTEWebsite.Models
         public required string UserName { get; set; }
         [Required(ErrorMessage = "Password is Required!")]
         public required string Password { get; set; }
-        public string Broker {  get; set; }
+        public string Broker { get; set; }
         public int Brokerage_ID { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? City { get; set;}
+        public string? City { get; set; }
         public string? Address { get; set; }
         public string? PostalCode { get; set; }
         public string Role { get; set; }
