@@ -52,6 +52,51 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpGet]
+        public async Task<IActionResult> Top_Reasons(DateTime startDate, DateTime endDate)
+        {
+            string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
+            endDate = endDate.Date.AddDays(1).AddTicks(-1);
+
+            var phoneCallReasons = await _dbContext.InComingCalls
+                .AsNoTracking()
+                .Where(inc => inc.createdon >= startDate && inc.createdon <= endDate && inc.Broker == Broker)
+                .ToListAsync();
+
+            var topReasons = phoneCallReasons
+                .SelectMany(inc => new[] { inc.phonecallreason, inc.phonecallreason2, inc.phonecallreason3 })
+                .Where(reason => !string.IsNullOrEmpty(reason) && reason != "NULL")
+                .GroupBy(reason => reason)
+                .Select(group => new { Reason = group.Key, Count = group.Count() })
+                .OrderByDescending(group => group.Count)
+                .Take(3)
+                .Select(group => group.Reason)
+                .ToList();
+
+            var reasonsByDay = phoneCallReasons
+                .GroupBy(inc => inc.createdon.Date)
+                .Select(g => new
+                {
+                    Date = g.Key.ToString("yyyy-MM-dd"),
+                    Reasons = topReasons.ToDictionary(reason => reason, reason => g.Count(inc => inc.phonecallreason == reason || inc.phonecallreason2 == reason || inc.phonecallreason3 == reason))
+                })
+                .OrderBy(g => g.Date)
+                .ToList();
+
+            var chartData = reasonsByDay.Select(day =>
+            {
+                var data = new Dictionary<string, object> { ["reasons"] = day.Date };
+                foreach (var reason in day.Reasons)
+                {
+                    data[reason.Key] = reason.Value;
+                }
+                return data;
+            }).ToList();
+
+            return Ok(chartData);
+        }
+
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> Phonecall_Reasons(DateTime startDate, DateTime endDate)
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);

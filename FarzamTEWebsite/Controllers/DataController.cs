@@ -4,11 +4,9 @@ using System.Text;
 using Newtonsoft.Json;
 using FarzamTEWebsite.Models;
 using System.Text.RegularExpressions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Security.Cryptography.Xml;
 
 
 
@@ -18,17 +16,15 @@ namespace FarzamTEWebsite.Controllers
     [ApiController]
     public class DataController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
 
-        public DataController(FarzamDbContext dbContext, IConfiguration configuration)
+        public DataController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 
         // Pishro -----------------------------------------------------------------------------------------------
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pishro_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.16.22.7:8081/api/HappyCallReport";
@@ -58,7 +54,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pishro_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.16.22.7:8081/api/HappyCallReport";
@@ -105,7 +101,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pishro_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.16.22.7:8081/api/InComingCallReport";
@@ -135,7 +131,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pishro_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.16.22.7:8081/api/InComingCallReport";
@@ -174,7 +170,7 @@ namespace FarzamTEWebsite.Controllers
             }
         }
         // Mobin ------------------------------------------------------------------------------------------------
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/HappyCallReport";
@@ -204,7 +200,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/HappyCallReport";
@@ -251,7 +247,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/InComingCallReport";
@@ -281,7 +277,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/InComingCallReport";
@@ -319,7 +315,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_CaseReport_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/CaseReport";
@@ -349,7 +345,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_CaseReport_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/CaseReport";
@@ -388,7 +384,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_TransportToSmart_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/TransportToSmart";
@@ -418,7 +414,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_TransportToSmart_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/TransportToSmart";
@@ -474,7 +470,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_Notice_Call_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = $"http://192.168.38.2:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
@@ -493,7 +489,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_Notice_Call_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = $"http://192.168.38.2:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
@@ -532,7 +528,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/NoticeReport";
@@ -562,7 +558,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Mobin_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://192.168.38.2:8081/api/NoticeReport";
@@ -598,7 +594,7 @@ namespace FarzamTEWebsite.Controllers
             }
         }
         // Pouyan -----------------------------------------------------------------------------------------------
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pouyan_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.18.10.40:8080/api/HappyCallReport";
@@ -628,7 +624,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pouyan_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.18.10.40:8080/api/HappyCallReport";
@@ -677,7 +673,7 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pouyan_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.18.10.40:8080/api/InComingCallReport";
@@ -707,7 +703,7 @@ namespace FarzamTEWebsite.Controllers
                 }
             }
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Pouyan_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
             string url = "http://172.18.10.40:8080/api/InComingCallReport";
