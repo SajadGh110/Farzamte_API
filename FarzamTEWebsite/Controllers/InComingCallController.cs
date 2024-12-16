@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -179,6 +180,61 @@ namespace FarzamTEWebsite.Controllers
                 .Select(inc => new { inc.fullName, inc.phonenumber, inc.description })
                 .ToListAsync();
             return Ok(selected_fields);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords(DateTime date)
+        {
+            var fakeRecords = new List<InComingCall>();
+            var random = new Random();
+            var phonecallreasons = new[] { "مالی", "کاربری", "ثبت نام", "خدمات" };
+            string[] phonecallreasondetails = { "" };
+
+            for (int i = 0; i < random.Next(70, 150); i++)
+            {
+                var customer = "Customer " + random.Next(1, 9999);
+                var phonecallreason = phonecallreasons[random.Next(phonecallreasons.Length)];
+                
+                switch (phonecallreason)
+                {
+                    case "مالی":
+                        phonecallreasondetails = new[] { "دریافت وجه", "واریز وجه" };
+                        break;
+                    case "کاربری":
+                        phonecallreasondetails = new[] { "درخواست مجدد کاربری", "مشکل تعیین و ثبت رمز عبور", "عدم ارسال پیامک", "عدم دریافت نام کاربری" };
+                        break;
+                    case "ثبت نام":
+                        phonecallreasondetails = new[] { "ثبت نام غیرحضوری", "ویرایش اطلاعات", "سایر", "فراخوانی اطلاعات" };
+                        break;
+                    case "خدمات":
+                        phonecallreasondetails = new[] { "اختلال در پرتفو", "مسدودی", "عرضه اولیه", "خرید و فروش" };
+                        break;
+                    default:
+                        break;
+                }
+                var fakeRecord = new InComingCall
+                {
+                    from = customer,
+                    to = "Operator " + random.Next(1, 25),
+                    automationid = random.Next(100000000, 999999999).ToString(),
+                    Broker = "demo",
+                    phonenumber = "0912" + random.Next(1000000, 9999999).ToString(),
+                    createdon = date,
+                    description = "متن تست برای دمو " + random.Next(1, 10),
+                    phonecallreason = phonecallreason,
+                    phonecallreason2 = "",
+                    phonecallreason3 = "",
+                    phonecallreasondetail = phonecallreasondetails[random.Next(phonecallreasondetails.Length)],
+                    phonecallreasondetail2 = "",
+                    phonecallreasondetail3 = "",
+                    fullName = customer,
+                };
+                fakeRecords.Add(fakeRecord);
+            }
+            _dbContext.InComingCalls.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
         }
     }
 }
