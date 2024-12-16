@@ -11,11 +11,9 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class BrokerageController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
-        public BrokerageController(FarzamDbContext dbContext, IConfiguration configuration)
+        public BrokerageController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 

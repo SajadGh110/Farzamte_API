@@ -11,26 +11,31 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class TransportToSmartController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
 
-        public TransportToSmartController(FarzamDbContext dbContext, IConfiguration configuration)
+        public TransportToSmartController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> LastDate()
+        public async Task<IActionResult> Date()
         {
             string Broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var LastDate = _dbContext.TransportsToSmart
+
+            var uniqueDates = await _dbContext.TransportsToSmart
                 .AsNoTracking()
-                .Where(inc => inc.Broker == Broker)
-                .Max(inc => inc.createdon)
-                .ToString("yyyy-MM-dd");
-            return Ok(new { EndDate = LastDate });
+                .Where(hc => hc.Broker == Broker)
+                .Select(hc => hc.createdon.Date)
+                .Distinct()
+                .OrderByDescending(date => date)
+                .ToListAsync();
+
+            if (uniqueDates.Count == 0)
+                return NotFound("No records found.");
+
+            return Ok(new { StartDate = uniqueDates.Last().ToString("yyyy-MM-dd"), LastDate = uniqueDates.First().ToString("yyyy-MM-dd") });
         }
 
         [Authorize]
@@ -170,7 +175,8 @@ namespace FarzamTEWebsite.Controllers
                     hc.Id,
                     hc.from,
                     hc.to,
-                    description = string.IsNullOrEmpty(hc.description) || hc.description == "NULL" ? "نامشخص" : hc.description.Length > 20 ? hc.description.Substring(0, 20) + "..." : hc.description.Replace("\"", ""),
+                    hc.nationalCode,
+                    hc.description,
                     hc.createdon,
                     hc.resultOfCall,
                     customerSatisfaction = string.IsNullOrEmpty(hc.customerSatisfaction) || hc.customerSatisfaction == "NULL" ? "نامشخص" : hc.customerSatisfaction
@@ -195,7 +201,8 @@ namespace FarzamTEWebsite.Controllers
                     hc.Id,
                     hc.from,
                     hc.to,
-                    description = string.IsNullOrEmpty(hc.description) || hc.description == "NULL" ? "نامشخص" : hc.description.Length > 20 ? hc.description.Substring(0, 20) + "..." : hc.description.Replace("\"", ""),
+                    hc.nationalCode,
+                    hc.description,
                     hc.createdon,
                     hc.resultOfCall,
                     customerSatisfaction = string.IsNullOrEmpty(hc.customerSatisfaction) || hc.customerSatisfaction == "NULL" ? "نامشخص" : hc.customerSatisfaction
@@ -220,7 +227,8 @@ namespace FarzamTEWebsite.Controllers
                     hc.Id,
                     hc.from,
                     hc.to,
-                    description = string.IsNullOrEmpty(hc.description) || hc.description == "NULL" ? "نامشخص" : hc.description.Length > 20 ? hc.description.Substring(0, 20) + "..." : hc.description.Replace("\"", ""),
+                    hc.nationalCode,
+                    hc.description,
                     hc.createdon,
                     hc.resultOfCall,
                     customerSatisfaction = string.IsNullOrEmpty(hc.customerSatisfaction) || hc.customerSatisfaction == "NULL" ? "نامشخص" : hc.customerSatisfaction
@@ -245,7 +253,8 @@ namespace FarzamTEWebsite.Controllers
                     hc.Id,
                     hc.from,
                     hc.to,
-                    description = string.IsNullOrEmpty(hc.description) || hc.description == "NULL" ? "نامشخص" : hc.description.Length > 20 ? hc.description.Substring(0, 20) + "..." : hc.description.Replace("\"", ""),
+                    hc.nationalCode,
+                    hc.description,
                     hc.createdon,
                     hc.resultOfCall,
                     customerSatisfaction = string.IsNullOrEmpty(hc.customerSatisfaction) || hc.customerSatisfaction == "NULL" ? "نامشخص" : hc.customerSatisfaction
@@ -270,7 +279,8 @@ namespace FarzamTEWebsite.Controllers
                     hc.Id,
                     hc.from,
                     hc.to,
-                    description = string.IsNullOrEmpty(hc.description) || hc.description == "NULL" ? "نامشخص" : hc.description.Length > 20 ? hc.description.Substring(0, 20) + "..." : hc.description.Replace("\"", ""),
+                    hc.nationalCode,
+                    hc.description,
                     hc.createdon,
                     hc.resultOfCall,
                     customerSatisfaction = string.IsNullOrEmpty(hc.customerSatisfaction) || hc.customerSatisfaction == "NULL" ? "نامشخص" : hc.customerSatisfaction

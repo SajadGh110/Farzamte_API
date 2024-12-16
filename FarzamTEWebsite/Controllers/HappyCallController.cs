@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,9 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class HappyCallController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
-        public HappyCallController(FarzamDbContext dbContext, IConfiguration configuration)
+        public HappyCallController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 
@@ -536,6 +535,55 @@ namespace FarzamTEWebsite.Controllers
                 .OrderByDescending(hc => hc.Count)
                 .ToList();
             return Ok(ActiveChoosingBrokerage_Count);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords(DateTime date)
+        {
+            var fakeRecords = new List<HappyCall>();
+            var random = new Random();
+            var tradeStatuses = new[] { "Inactive", "Active" };
+            var statusReasons = new[] { "Made", "Unsuccessful", "ReCall" };
+            var introductions = new[] { "شبکه های اجتماعی", "معرفی آشنایان", "تبلیغات و بازاریابی", "نمایشگاه", "اتفاقی" };
+            var ChoosingBrokerages = new[] { "سرمایه گذاری", "شرایط اعتبار", "بورس کالا", "اتفاقی", "سامانه های معاملاتی", "عرضه اولیه"};
+            
+
+            for (int i = 0; i < random.Next(5,25); i++)
+            {
+                var fakeRecord = new HappyCall
+                {
+                    CallTo = "Customer " + random.Next(1,9999),
+                    CallFrom = "Operator " + random.Next(1,25),
+                    TradeStatus = tradeStatuses[random.Next(tradeStatuses.Length)],
+                    statusReason = statusReasons[random.Next(statusReasons.Length)],
+                    nationalCode = "Code" + random.Next(100000000, 999999999).ToString(),
+                    Broker = "demo",
+                    phonenumber = "0912" + random.Next(1000000, 9999999).ToString(),
+                    createdon = date,
+                    RegDate = DateTime.Now.AddDays(-random.Next(0, 30)),
+                    introduction = introductions[random.Next(introductions.Length)],
+                    ChoosingBrokerage = ChoosingBrokerages[random.Next(ChoosingBrokerages.Length)],
+                    ExplanationClub = random.Next(0, 2) == 1,
+                    UserRequest = "",
+                    checkingPanel = "Panel " + random.Next(1, 10),
+                    CustomerRequirement = "Requirement " + random.Next(1, 10),
+                    CustomerRequirementDesc = "Description " + random.Next(1, 10),
+                    CustomerRequirement1 = "Requirement1 " + random.Next(1, 10),
+                    CustomerRequirementDesc1 = "Description1 " + random.Next(1, 10),
+                    CustomerRequirement2 = "Requirement2 " + random.Next(1, 10),
+                    CustomerRequirementDesc2 = "Description2 " + random.Next(1, 10),
+                    CustomerRequirement3 = "Requirement3 " + random.Next(1, 10),
+                    CustomerRequirementDesc3 = "Description3 " + random.Next(1, 10),
+                    TradeStatusAffter = tradeStatuses[random.Next(tradeStatuses.Length)],
+                    TotalTradeAmount = random.Next(10000, 1000000).ToString(),
+                    totalBrokerCommission = random.Next(100, 10000).ToString()
+                };
+                fakeRecords.Add(fakeRecord);
+            }
+            _dbContext.HappyCalls.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
         }
     }
 }

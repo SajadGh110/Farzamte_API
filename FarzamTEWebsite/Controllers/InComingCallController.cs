@@ -11,11 +11,9 @@ namespace FarzamTEWebsite.Controllers
     [Authorize]
     public class InComingCallController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
-        public InComingCallController(FarzamDbContext dbContext, IConfiguration configuration)
+        public InComingCallController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 

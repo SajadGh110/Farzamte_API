@@ -10,11 +10,9 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class BrokerageCMPController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
-        public BrokerageCMPController(FarzamDbContext dbContext, IConfiguration configuration)
+        public BrokerageCMPController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 

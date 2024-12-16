@@ -11,12 +11,10 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class NoticeController : ControllerBase
     {
-        private IConfiguration _configuration;
         private FarzamDbContext _dbContext;
 
-        public NoticeController(FarzamDbContext dbContext, IConfiguration configuration)
+        public NoticeController(FarzamDbContext dbContext)
         {
-            _configuration = configuration;
             _dbContext = dbContext;
         }
 
