@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -230,6 +231,107 @@ namespace FarzamTEWebsite.Controllers
                 .ToListAsync();
 
             return Ok(Noticetype);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords_Call(DateTime date)
+        {
+            var fakeRecords = new List<Notice_Call>();
+            var random = new Random();
+            var noticetypes = new[] { "مجمع افزایش سرمایه", "مجمع سود نقدی" };
+            var typeofcapitalincreases = new[] { "سود انباشته", "آورده نقدی" };
+            var symbols = new[] { "فولاد", "حکشتی", "دانا", "غگل", "ومعادن" };
+            var experts = new[] { "fatemeh rezaei", "akram lotfi", "Fateme Akbari" };
+            var statusReasons = new[] { "Made", "Unsuccessful" };
+
+            for (int i = 0; i < random.Next(9, 35); i++)
+            {
+                var symbol = symbols[random.Next(symbols.Length)];
+                var noticetype = noticetypes[random.Next(noticetypes.Length)];
+
+                switch (noticetype)
+                {
+                    case "مجمع افزایش سرمایه":
+                        typeofcapitalincreases = new[] { "سود انباشته", "آورده نقدی" };
+                        break;
+                    case "مجمع سود نقدی":
+                        typeofcapitalincreases = new[] {"NULL"};
+                        break;
+                    default:
+                        break;
+                }
+
+                var fakeRecord = new Notice_Call
+                {
+                    noticeid = "id-" + random.Next(1, 9999),
+                    fullName = "Customer " + random.Next(1, 25),
+                    noticetype = noticetype,
+                    statusReason = statusReasons[random.Next(statusReasons.Length)],
+                    typeofcapitalincrease = typeofcapitalincreases[random.Next(typeofcapitalincreases.Length)],
+                    symbol = symbol,
+                    expert = experts[random.Next(experts.Length)],
+                    Broker = "demo",
+                    createdon = date,
+                    company = "Company " + symbol,
+                    description = "test text " + random.Next(1, 9999),
+                };
+                fakeRecords.Add(fakeRecord);
+            }
+            _dbContext.Notice_Call.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords_SMS(DateTime date)
+        {
+            var fakeRecords = new List<Notice_SMS>();
+            var random = new Random();
+            var noticetypes = new[] { "مجمع افزایش سرمایه", "مجمع سود نقدی", "آگهی دعوت ( افزایش سرمایه)", "تصمیمات مجمع عمومی عادی سالیانه" };
+            var typeofcapitalincreases = new[] { "سود انباشته", "آورده نقدی" };
+            var symbols = new[] { "فولاد", "حکشتی", "دانا", "امین", "فروس", "واعتبار", "شپدیس", "سامان", "فملی", "هرمز", "شپنا", "شتران", "وتوکا", "فسازان", "والبر", "فمراد", "فاراک" };
+            var experts = new[] { "fatemeh rezaei", "akram lotfi", "Fateme Akbari" };
+
+            for (int i = 0; i < random.Next(100, 400); i++)
+            {
+                var symbol = symbols[random.Next(symbols.Length)];
+                var noticetype = noticetypes[random.Next(noticetypes.Length)];
+
+                switch (noticetype)
+                {
+                    case "مجمع افزایش سرمایه":
+                        typeofcapitalincreases = new[] { "سود انباشته", "آورده نقدی" };
+                        break;
+                    case "مجمع سود نقدی":
+                    case "آگهی دعوت ( افزایش سرمایه)":
+                    case "تصمیمات مجمع عمومی عادی سالیانه":
+                        typeofcapitalincreases = new[] { "NULL" };
+                        break;
+                    default:
+                        break;
+                }
+
+                var fakeRecord = new Notice_SMS
+                {
+                    noticeid = "id-" + random.Next(1, 9999),
+                    fullName = "Customer " + random.Next(1, 25),
+                    noticetype = noticetype,
+                    typeofcapitalincrease = typeofcapitalincreases[random.Next(typeofcapitalincreases.Length)],
+                    symbol = symbol,
+                    expert = experts[random.Next(experts.Length)],
+                    Broker = "demo",
+                    modifiedon = date,
+                    company = "Company " + symbol,
+                    description = "test text " + random.Next(1, 9999),
+                    response_id = "res" + random.Next(1,9999)
+                };
+                fakeRecords.Add(fakeRecord);
+            }
+            _dbContext.Notice_SMS.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
         }
     }
 }

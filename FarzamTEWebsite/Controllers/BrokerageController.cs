@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -488,6 +489,80 @@ namespace FarzamTEWebsite.Controllers
                 BEI_Total_Value = AllTransactions.Sum(t => (long?)t.BEI_Total_Value),
                 BEI_Brokerage_Value_Rank = Brokerage_Rank_BEI_Total_Value?.Rank ?? 0
             });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords(int brokerage_id, String date)
+        {
+            var fakeRecords = new List<Transaction_Statistics_M>();
+            var random = new Random();
+
+            var BOBT_Oragh_Bedehi_Online = random.Next(0, 10000000);
+            var BOBT_Oragh_Bedehi_Normal = random.Next(0, 10000000);
+            var BOBT_Moshtaghe_Online = random.Next(0, 10000000);
+            var BOBT_Moshtaghe_Normal = random.Next(0, 10000000);
+            var BOBT_Sarmaye_Herfei_Online = random.Next(0, 200000);
+            var BOBT_Sarmaye_Herfei_Normal = random.Next(0, 200000);
+            var BOBT_Sarmaye_Herfei_Algorithm = random.Next(0, 200000);
+            var BOBT_saham_Online = random.Next(500000, 200000000);
+            var BOBT_saham_Normal = random.Next(0, 1000000);
+            var BOBT_saham_Algorithm = random.Next(0, 200000);
+            var BOBT_Total_Value = BOBT_Oragh_Bedehi_Online + BOBT_Oragh_Bedehi_Normal + BOBT_Moshtaghe_Online + BOBT_Moshtaghe_Normal + BOBT_Sarmaye_Herfei_Online + BOBT_Sarmaye_Herfei_Normal + BOBT_Sarmaye_Herfei_Algorithm + BOBT_saham_Online + BOBT_saham_Normal + BOBT_saham_Algorithm;
+            var FI_Brokerage_Station = random.Next(200000, 200000000);
+            var FI_Online_Normal = random.Next(200000, 200000000);
+            var FI_Online_Group = random.Next(5000, 20000000);
+            var FI_Online_Other = random.Next(5000, 20000000);
+            var FI_Total_Value = FI_Brokerage_Station + FI_Online_Normal + FI_Online_Group + FI_Online_Other;
+            var BOBT_AND_FI_Total_Value = BOBT_Total_Value + FI_Total_Value;
+            var BKI_Physical = random.Next(100000, 200000000);
+            var BKI_Self = random.Next(100000, 400000000);
+            var BKI_Ati = random.Next(10000, 5000000);
+            var BKI_Ekhtiar = random.Next(0, 1000000);
+            var BKI_Total_Value = BKI_Physical + BKI_Self + BKI_Ati + BKI_Ekhtiar;
+            var BEI_Physical = random.Next(0, 50000000);
+            var BEI_Moshtaghe = random.Next(0, 7000000);
+            var BEI_Other = random.Next(0, 50000000);
+            var BEI_Total_Value = BEI_Physical + BEI_Moshtaghe + BEI_Other;
+            var All_Total_Value = BOBT_AND_FI_Total_Value + BKI_Total_Value + BEI_Total_Value;
+
+            var fakeRecord = new Transaction_Statistics_M
+            {
+                Brokerage_ID = brokerage_id,
+                Date_Monthly = date,
+                BOBT_Oragh_Bedehi_Online = BOBT_Oragh_Bedehi_Online,
+                BOBT_Oragh_Bedehi_Normal = BOBT_Oragh_Bedehi_Normal,
+                BOBT_Moshtaghe_Online = BOBT_Moshtaghe_Online,
+                BOBT_Moshtaghe_Normal = BOBT_Moshtaghe_Normal,
+                BOBT_Sarmaye_Herfei_Online = BOBT_Sarmaye_Herfei_Online,
+                BOBT_Sarmaye_Herfei_Normal = BOBT_Sarmaye_Herfei_Normal,
+                BOBT_Sarmaye_Herfei_Algorithm = BOBT_Sarmaye_Herfei_Algorithm,
+                BOBT_saham_Online = BOBT_saham_Online,
+                BOBT_saham_Normal = BOBT_saham_Normal,
+                BOBT_saham_Algorithm = BOBT_saham_Algorithm,
+                BOBT_Total_Value = BOBT_Total_Value,
+                FI_Brokerage_Station = FI_Brokerage_Station,
+                FI_Online_Normal = FI_Online_Normal,
+                FI_Online_Group = FI_Online_Group,
+                FI_Online_Other = FI_Online_Other,
+                FI_Total_Value = FI_Total_Value,
+                BOBT_AND_FI_Total_Value = BOBT_AND_FI_Total_Value,
+                BKI_Physical = BKI_Physical,
+                BKI_Self = BKI_Self,
+                BKI_Ati = BKI_Ati,
+                BKI_Ekhtiar = BKI_Ekhtiar,
+                BKI_Total_Value = BKI_Total_Value,
+                BEI_Physical = BEI_Physical,
+                BEI_Moshtaghe = BEI_Moshtaghe,
+                BEI_Other = BEI_Other,
+                BEI_Total_Value = BEI_Total_Value,
+                All_Total_Value = All_Total_Value
+            };
+            fakeRecords.Add(fakeRecord);
+            
+            _dbContext.Transaction_Statistics_M.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
         }
     }
 }

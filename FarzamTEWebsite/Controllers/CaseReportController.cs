@@ -1,4 +1,5 @@
 ﻿using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -233,6 +234,95 @@ namespace FarzamTEWebsite.Controllers
                 return NotFound("Wrong ID!");
             }
             return Ok(selected_record);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GenerateFakeRecords(DateTime date)
+        {
+            var fakeRecords = new List<CaseReport>();
+            var random = new Random();
+            var phonecallreasons = new[] { "کاربری", "انتقاد پیشنهاد", "مالی", "خدمات", "ثبت نام" };
+            string[] phonecallreasondetails = { "" };
+            string[] casetypes = { "" };
+            var CaseResolutionsolvers = new[] { "Azam Karimi", "Hadiseh Amirbeigi"};
+            var Owners = new[] { "Faezeh Safizadeh", "Akram Lotfi", "Zohreh Khandan", "Rezvaneh Akbari" };
+            var Status = "";
+
+            for (int i = 0; i < random.Next(10, 50); i++)
+            {
+                var customer = "Customer " + random.Next(1, 9999);
+                var phonecallreason = phonecallreasons[random.Next(phonecallreasons.Length)];
+                var statuscode = random.Next(1, 4).ToString();
+
+                switch (phonecallreason)
+                {
+                    case "کاربری":
+                        phonecallreasondetails = new[] { "تغییر نسخه پنل", "درخواست مجدد کاربری" };
+                        casetypes = new[] { "تغییر نسخه پنل", "درخواست مجدد کاربری" };
+                        break;
+                    case "انتقاد پیشنهاد":
+                        phonecallreasondetails = new[] { "انتقاد", "پیشنهاد" };
+                        casetypes = new[] { "انتقاد", "پیشنهاد" };
+                        break;
+                    case "مالی":
+                        phonecallreasondetails = new[] { "عدم دریافت وجه درخواستی", "واریز وجه", "برداشت وجه" };
+                        casetypes = new[] { "عدم دریافت وجه درخواستی", "واریز وجه", "برداشت وجه" };
+                        break;
+                    case "خدمات":
+                        phonecallreasondetails = new[] { "امکان خروح از حساب", "مسدودی", "نیاز به پشتیبانی", "خرید و فروش" };
+                        casetypes = new[] { "امکان خروح از حساب", "مسدودی", "نیاز به پشتیبانی", "خرید و فروش" };
+                        break;
+                    case "ثبت نام":
+                        phonecallreasondetails = new[] { "ثبت نام غیرحضوری", "پیگیری ثبت نام", "تکمیل حساب کاربری" };
+                        casetypes = new[] { "ثبت نام غیرحضوری", "پیگیری ثبت نام", "تکمیل حساب کاربری" };
+                        break;
+                    default:
+                        break;
+                }
+
+                switch (statuscode)
+                {
+                    case "1":
+                        Status = "مشکل حل شده";
+                        break;
+                    case "2":
+                        Status = "لغو شده";
+                        break;
+                    case "3":
+                        Status = "درحال بررسی";
+                        break;
+                    default:
+                        break;
+                }
+
+                var phonecallReasonsDetails = phonecallreasondetails[random.Next(phonecallreasondetails.Length)];
+                var casetype = casetypes[random.Next(casetypes.Length)];
+
+                var fakeRecord = new CaseReport
+                {
+                    statuscode = statuscode,
+                    status = Status,
+                    Broker = "demo",
+                    description = "متن تست برای دمو " + random.Next(1, 10),
+                    CaseResolutionDescription = "detail " + random.Next(200,500),
+                    caseAutoNumber = random.Next(100,999) + "-" + random.Next(100, 999) + "-" + random.Next(100, 999),
+                    CustomerName = customer,
+                    owner = Owners[random.Next(Owners.Length)],                    
+                    createdon = date,
+                    CaseResolutionCreatedOn = date.AddDays(2),
+                    CaseResolutionsolver = CaseResolutionsolvers[random.Next(CaseResolutionsolvers.Length)],
+                    CaseResolutionSubject = customer,
+                    phonecallReason = phonecallreason,
+                    phonecallReasonsDetails = phonecallReasonsDetails,
+                    casetype = casetype,
+                    title = phonecallreason + " - " + casetype,
+                };
+                fakeRecords.Add(fakeRecord);
+            }
+            _dbContext.CaseReports.AddRange(fakeRecords);
+            _dbContext.SaveChanges();
+            return Ok($"{fakeRecords.Count} fake records have been generated and saved.");
         }
     }
 }
