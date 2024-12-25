@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public required string from { get; set; }
         public required string to { get; set; }
-        public required string automationid { get; set; }
+        public string? automationid { get; set; }
         public string? description { get; set; }
         public required string Broker { get; set; }
         public string? phonecallreason { get; set; }

@@ -1,5 +1,6 @@
 ﻿using FarzamTEWebsite.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace FarzamTEWebsite.Data
 {
@@ -8,6 +9,10 @@ namespace FarzamTEWebsite.Data
         public FarzamDbContext(DbContextOptions<FarzamDbContext> options) : base(options)
         {
             Database.Migrate();
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
 
         public DbSet<User> Users { get; set; }
