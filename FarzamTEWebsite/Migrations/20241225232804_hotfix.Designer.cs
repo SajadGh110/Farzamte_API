@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    [Migration("20241225194946_Hotfix")]
-    partial class Hotfix
+    [Migration("20241225232804_hotfix")]
+    partial class hotfix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -233,7 +233,6 @@ namespace FarzamTEWebsite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("from")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("fullName")

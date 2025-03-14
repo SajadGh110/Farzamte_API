@@ -5,32 +5,34 @@
 namespace FarzamTEWebsite.Migrations
 {
     /// <inheritdoc />
-    public partial class Hotfix : Migration
+    public partial class hotfix_2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.DropColumn(
                 name: "automationid",
-                table: "InComingCalls",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                table: "InComingCalls");
+
+            migrationBuilder.DropColumn(
+                name: "fullName",
+                table: "InComingCalls");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "automationid",
                 table: "InComingCalls",
                 type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "fullName",
+                table: "InComingCalls",
+                type: "nvarchar(max)",
+                nullable: true);
         }
     }
 }

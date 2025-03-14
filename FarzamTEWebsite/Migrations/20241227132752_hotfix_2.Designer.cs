@@ -4,6 +4,7 @@ using FarzamTEWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    partial class FarzamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227132752_hotfix_2")]
+    partial class hotfix_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,8 +395,8 @@ namespace FarzamTEWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("All_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("All_Total_Value")
+                        .HasColumnType("int");
 
                     b.Property<int?>("BEI_Moshtaghe")
                         .HasColumnType("int");
@@ -404,8 +407,8 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int?>("BEI_Physical")
                         .HasColumnType("int");
 
-                    b.Property<long?>("BEI_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("BEI_Total_Value")
+                        .HasColumnType("int");
 
                     b.Property<int?>("BKI_Ati")
                         .HasColumnType("int");
@@ -419,11 +422,11 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int?>("BKI_Self")
                         .HasColumnType("int");
 
-                    b.Property<long?>("BKI_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("BKI_Total_Value")
+                        .HasColumnType("int");
 
-                    b.Property<long?>("BOBT_AND_FI_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("BOBT_AND_FI_Total_Value")
+                        .HasColumnType("int");
 
                     b.Property<int?>("BOBT_Moshtaghe_Normal")
                         .HasColumnType("int");
@@ -446,8 +449,8 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int?>("BOBT_Sarmaye_Herfei_Online")
                         .HasColumnType("int");
 
-                    b.Property<long?>("BOBT_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("BOBT_Total_Value")
+                        .HasColumnType("int");
 
                     b.Property<int?>("BOBT_saham_Algorithm")
                         .HasColumnType("int");
@@ -476,8 +479,8 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int?>("FI_Online_Other")
                         .HasColumnType("int");
 
-                    b.Property<long?>("FI_Total_Value")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("FI_Total_Value")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
