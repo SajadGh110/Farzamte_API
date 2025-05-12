@@ -1,5 +1,8 @@
 using FarzamTEWebsite.Data;
+using FarzamTEWebsite.Data.Initialization;
 using FarzamTEWebsite.Filters;
+using FarzamTEWebsite.Services;
+using FarzamTEWebsite.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var api_key = builder.Configuration.GetConnectionString("api-key");
 
 builder.Services.AddControllers(option =>
@@ -51,7 +53,10 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddDbContext<FarzamDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<FarzamDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IInComingCall_StatService, InComingCall_StatService>();
 
 builder.Services.AddCors(options =>
 {
@@ -60,12 +65,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 
 }
 
+await AdminSeeder.SeedAdminAsync(app.Services);
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseDeveloperExceptionPage();

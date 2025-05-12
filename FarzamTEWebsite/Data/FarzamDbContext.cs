@@ -25,5 +25,6 @@ namespace FarzamTEWebsite.Data
         public DbSet<TTS_Reason> TTS_Reasons { get; set; }
         public DbSet<Notice_Call> Notice_Call { get; set; }
         public DbSet<Notice_SMS> Notice_SMS { get; set; }
+        public DbSet<InComingCall_Stat> inComingCall_Stats { get; set; }
     }
 }

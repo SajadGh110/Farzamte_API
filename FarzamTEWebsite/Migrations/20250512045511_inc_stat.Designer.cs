@@ -4,6 +4,7 @@ using FarzamTEWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarzamTEWebsite.Migrations
 {
     [DbContext(typeof(FarzamDbContext))]
-    partial class FarzamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512045511_inc_stat")]
+    partial class inc_stat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,10 +285,6 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int>("Avg_Wait")
                         .HasColumnType("int");
 
-                    b.Property<string>("Broker")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Logins")
                         .HasColumnType("int");
 
@@ -295,9 +294,8 @@ namespace FarzamTEWebsite.Migrations
                     b.Property<int>("Max_Callers")
                         .HasColumnType("int");
 
-                    b.Property<string>("Month")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("Month")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Received")
                         .HasColumnType("int");
@@ -313,6 +311,10 @@ namespace FarzamTEWebsite.Migrations
 
                     b.Property<int>("Unanswered")
                         .HasColumnType("int");
+
+                    b.Property<string>("brokerage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("type")
                         .IsRequired()

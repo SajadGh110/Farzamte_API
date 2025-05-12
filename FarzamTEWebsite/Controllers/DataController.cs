@@ -868,6 +868,71 @@ namespace FarzamTEWebsite.Controllers
                     return BadRequest(response);
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Pouyan_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
+        {
+            string url = "http://172.18.10.40:8080/api/NoticeReport";
+            var data = new
+            {
+                StartDate = stDate,
+                EndDate = enDate
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    return Ok(responseContent);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> Pouyan_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
+        {
+            string url = "http://172.18.10.40:8080/api/NoticeReport";
+            var data = new
+            {
+                StartDate = stDate,
+                EndDate = enDate
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    List<Notice_SMS> Notice_SMSObjects = JsonConvert.DeserializeObject<List<Notice_SMS>>(responseContent);
+                    foreach (var Notice_SMS in Notice_SMSObjects)
+                    {
+                        Notice_SMS.Broker = "Pouyan";
+                    }
+                    _dbContext.Notice_SMS.AddRange(Notice_SMSObjects);
+                    _dbContext.SaveChanges();
+                    return Ok($"All Notices SMS From {stDate:yyyy-MM-dd} to {enDate:yyyy-MM-dd} Saved!");
+                }
+                else
+                    return BadRequest(response);
+            }
+        }
         // Khobregan --------------------------------------------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Khobregan_HappyCall_ShowData(DateTime stDate, DateTime enDate)
@@ -1006,6 +1071,74 @@ namespace FarzamTEWebsite.Controllers
                     _dbContext.Notice_SMS.AddRange(Notice_SMSObjects);
                     _dbContext.SaveChanges();
                     return Ok($"All Notices SMS From {stDate:yyyy-MM-dd} to {enDate:yyyy-MM-dd} Saved!");
+                }
+                else
+                    return BadRequest(response);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> Khobregan_InComingCall_ShowData(DateTime stDate, DateTime enDate)
+        {
+            string url = "http://5.200.70.230:8181/api/InComingCallReport";
+            var data = new
+            {
+                StartDate = stDate,
+                EndDate = enDate
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    return Ok(responseContent);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> Khobregan_InComingCall_SaveData(DateTime stDate, DateTime enDate)
+        {
+            string url = "http://5.200.70.230:8181/api/InComingCallReport";
+            var data = new
+            {
+                StartDate = stDate,
+                EndDate = enDate
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    List<InComingCall> InComingCallObjects = JsonConvert.DeserializeObject<List<InComingCall>>(responseContent);
+                    foreach (var InComingCall in InComingCallObjects)
+                    {
+                        InComingCall.Broker = "Khobregan";
+                        InComingCall.phonecallreason = CleanPhoneCallReason(InComingCall.phonecallreason);
+                        InComingCall.phonecallreason2 = CleanPhoneCallReason(InComingCall.phonecallreason2);
+                        InComingCall.phonecallreason3 = CleanPhoneCallReason(InComingCall.phonecallreason3);
+                    }
+                    _dbContext.InComingCalls.AddRange(InComingCallObjects);
+                    _dbContext.SaveChanges();
+                    return Ok($"All InComingCalls From {stDate:yyyy-MM-dd} to {enDate:yyyy-MM-dd} Saved!");
                 }
                 else
                     return BadRequest(response);
