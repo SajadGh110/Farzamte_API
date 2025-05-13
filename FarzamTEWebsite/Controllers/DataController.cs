@@ -2,7 +2,6 @@
 using FarzamTEWebsite.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
@@ -16,17 +15,19 @@ namespace FarzamTEWebsite.Controllers
     public class DataController : ControllerBase
     {
         private FarzamDbContext _dbContext;
+        private readonly IConfiguration _configuration;
 
-        public DataController(FarzamDbContext dbContext)
+        public DataController(FarzamDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
+            _configuration = configuration;
         }
 
         // Pishro -----------------------------------------------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Pishro_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/HappyCallReport";
+            string url = GetPishroAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -36,7 +37,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -56,7 +57,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/HappyCallReport";
+            string url = GetPishroAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -66,7 +67,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -103,7 +104,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/InComingCallReport";
+            string url = GetPishroAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -113,7 +114,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -133,7 +134,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/InComingCallReport";
+            string url = GetPishroAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -143,7 +144,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -171,11 +172,11 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_Notice_Call_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = $"http://172.16.22.7:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
+            string url = GetPishroAPI() + $"/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
                 HttpResponseMessage response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -190,11 +191,11 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_Notice_Call_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = $"http://172.16.22.7:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
+            string url = GetPishroAPI() + $"/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
                 HttpResponseMessage response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -229,7 +230,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/NoticeReport";
+            string url = GetPishroAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -239,7 +240,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -259,7 +260,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pishro_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.16.22.7:8081/api/NoticeReport";
+            string url = GetPishroAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -269,7 +270,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -295,7 +296,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/HappyCallReport";
+            string url = GetMobinAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -305,7 +306,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -325,7 +326,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/HappyCallReport";
+            string url = GetMobinAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -335,7 +336,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -372,7 +373,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/InComingCallReport";
+            string url = GetMobinAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -382,7 +383,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -402,7 +403,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/InComingCallReport";
+            string url = GetMobinAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -412,7 +413,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -440,7 +441,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_CaseReport_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/CaseReport";
+            string url = GetMobinAPI() + "/api/CaseReport";
             var data = new
             {
                 StartDate = stDate,
@@ -450,7 +451,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -470,7 +471,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_CaseReport_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/CaseReport";
+            string url = GetMobinAPI() + "/api/CaseReport";
             var data = new
             {
                 StartDate = stDate,
@@ -480,7 +481,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -514,7 +515,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_TransportToSmart_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/TransportToSmart";
+            string url = GetMobinAPI() + "/api/TransportToSmart";
             var data = new
             {
                 StartDate = stDate,
@@ -524,7 +525,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -544,7 +545,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_TransportToSmart_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/TransportToSmart";
+            string url = GetMobinAPI() + "/api/TransportToSmart";
             var data = new
             {
                 StartDate = stDate,
@@ -554,7 +555,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -600,11 +601,11 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_Notice_Call_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = $"http://192.168.38.2:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
+            string url = GetMobinAPI() + $"/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
                 HttpResponseMessage response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -619,11 +620,11 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_Notice_Call_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = $"http://192.168.38.2:8081/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
+            string url = GetMobinAPI() + $"/api/NoticeReport?StartDate={stDate.ToString("yyyy-MM-dd")}&EndDate={enDate.ToString("yyyy-MM-dd")}";
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
                 HttpResponseMessage response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -658,7 +659,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/NoticeReport";
+            string url = GetMobinAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -668,7 +669,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -688,7 +689,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Mobin_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://192.168.38.2:8081/api/NoticeReport";
+            string url = GetMobinAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -698,7 +699,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -724,7 +725,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/HappyCallReport";
+            string url = GetPouyanAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -734,7 +735,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -754,7 +755,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/HappyCallReport";
+            string url = GetPouyanAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -764,7 +765,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -803,7 +804,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/InComingCallReport";
+            string url = GetPouyanAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -813,7 +814,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -833,7 +834,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/InComingCallReport";
+            string url = GetPouyanAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -843,7 +844,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -871,7 +872,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/NoticeReport";
+            string url = GetPouyanAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -881,7 +882,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -901,7 +902,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Pouyan_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://172.18.10.40:8080/api/NoticeReport";
+            string url = GetPouyanAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -911,7 +912,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -937,7 +938,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_HappyCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/HappyCallReport";
+            string url = GetKhobreganAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -947,7 +948,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -967,7 +968,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_HappyCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/HappyCallReport";
+            string url = GetKhobreganAPI() + "/api/HappyCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -977,7 +978,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -1014,7 +1015,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_Notice_SMS_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/NoticeReport";
+            string url = GetKhobreganAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -1024,7 +1025,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -1044,7 +1045,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_Notice_SMS_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/NoticeReport";
+            string url = GetKhobreganAPI() + "/api/NoticeReport";
             var data = new
             {
                 StartDate = stDate,
@@ -1054,7 +1055,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -1079,7 +1080,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_InComingCall_ShowData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/InComingCallReport";
+            string url = GetKhobreganAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -1089,7 +1090,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -1109,7 +1110,7 @@ namespace FarzamTEWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Khobregan_InComingCall_SaveData(DateTime stDate, DateTime enDate)
         {
-            string url = "http://5.200.70.230:8181/api/InComingCallReport";
+            string url = GetKhobreganAPI() + "/api/InComingCallReport";
             var data = new
             {
                 StartDate = stDate,
@@ -1119,7 +1120,7 @@ namespace FarzamTEWebsite.Controllers
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Add("Authorization", "739C109D-F6FC-EC11-BAD5-005056B5FE72");
+                client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationToken());
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -1152,6 +1153,12 @@ namespace FarzamTEWebsite.Controllers
 
             return Regex.Replace(reason, @"\d+\.?", "").Trim();
         }
+
+        private string GetPishroAPI() => _configuration.GetValue<string>("ConnectionStrings:pishroAPI");
+        private string GetMobinAPI() => _configuration.GetValue<string>("ConnectionStrings:mobinAPI");
+        private string GetPouyanAPI() => _configuration.GetValue<string>("ConnectionStrings:pouyanAPI");
+        private string GetKhobreganAPI() => _configuration.GetValue<string>("ConnectionStrings:khobreganAPI");
+        private string GetAuthorizationToken() => _configuration.GetValue<string>("ConnectionStrings:AuthorizationData");
 
         [Authorize(Policy = "OwnerPolicy")]
         [HttpPost]
