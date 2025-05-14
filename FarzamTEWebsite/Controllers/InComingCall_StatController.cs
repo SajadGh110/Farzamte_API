@@ -19,38 +19,38 @@ namespace FarzamTEWebsite.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> LastDate()
+        public async Task<List<string>> AllTypes()
         {
             string broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var LastDate = await _Inc_StatService.GetLastDate(broker);
-            return Ok(LastDate);
+            var AllTypes = await _Inc_StatService.GetAllTypes(broker);
+            return AllTypes;
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<List<string>> AllDate(string type)
+        public async Task<List<string>> AllDates(string type)
         {
             string broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var AllDate = await _Inc_StatService.GetAllDate(broker, type);
-            return AllDate;
+            var AllDates = await _Inc_StatService.GetAllDates(broker, type);
+            return AllDates;
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<List<InComingCall_Stat_DTO>> IncStat(string type)
+        public async Task<List<InComingCall_Stat_DTO>> IncStats(string type)
         {
             string broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var IncStat = await _Inc_StatService.GetIncStat(broker, type);
-            return IncStat;
+            var IncStats = await _Inc_StatService.GetIncStat(broker, type);
+            return IncStats;
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<List<InComingCall_Stat_DTO>> IncStat_M(string type, string month)
+        public async Task<List<InComingCall_Stat_DTO>> IncStats_M(string type, string month)
         {
             string broker = User.FindFirstValue(ClaimTypes.PrimarySid);
-            var IncStat = await _Inc_StatService.GetIncStat(broker, type, month);
-            return IncStat;
+            var IncStats = await _Inc_StatService.GetIncStat(broker, type, month);
+            return IncStats;
         }
     }
 }

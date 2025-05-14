@@ -13,31 +13,33 @@ namespace FarzamTEWebsite.Services
             _dbContext = dbContext;
         }
 
-        public async Task<string> GetLastDate(string broker)
+        public async Task<List<string>> GetAllTypes(string broker)
         {
-            var LastDate = await _dbContext.inComingCall_Stats
+            var AllTypes = await _dbContext.inComingCall_Stats
                 .AsNoTracking()
                 .Where(inc => inc.Broker == broker)
-                .MaxAsync(inc => inc.Month);
-
-            return LastDate;
+                .Select(inc => inc.type)
+                .Distinct()
+                .ToListAsync();
+            return AllTypes;
         }
 
-        public async Task<List<string>> GetAllDate(string broker, string type)
+        public async Task<List<string>> GetAllDates(string broker, string type)
         {
-            var AllDate = await _dbContext.inComingCall_Stats
+            var AllDates = await _dbContext.inComingCall_Stats
                 .AsNoTracking()
                 .Where (inc => inc.Broker == broker && inc.type == type)
                 .Select(inc => inc.Month)
                 .ToListAsync();
-            return AllDate;
+            return AllDates;
         }
 
         public async Task<List<InComingCall_Stat_DTO>> GetIncStat(string broker, string type)
         {
-            var IncStat = await _dbContext.inComingCall_Stats
+            var IncStats = await _dbContext.inComingCall_Stats
                 .AsNoTracking()
                 .Where(inc => inc.Broker == broker && inc.type == type)
+                .OrderByDescending(inc => inc.Month)
                 .Select(inc => new InComingCall_Stat_DTO
                 {
                     Type = inc.type,
@@ -48,12 +50,12 @@ namespace FarzamTEWebsite.Services
                     Avg_Talk = inc.Avg_Talk
                 })
                 .ToListAsync();
-            return IncStat;
+            return IncStats;
         }
 
         public async Task<List<InComingCall_Stat_DTO>> GetIncStat(string broker, string type, string month)
         {
-            var IncStat = await _dbContext.inComingCall_Stats
+            var IncStats = await _dbContext.inComingCall_Stats
                 .AsNoTracking()
                 .Where(inc => inc.Broker == broker && inc.Month == month && inc.type == type)
                 .Select(inc => new InComingCall_Stat_DTO
@@ -66,7 +68,7 @@ namespace FarzamTEWebsite.Services
                     Avg_Talk = inc.Avg_Talk
                 })
                 .ToListAsync();
-            return IncStat;
+            return IncStats;
         }
     }
 }
