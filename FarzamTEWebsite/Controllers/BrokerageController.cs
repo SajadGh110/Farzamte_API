@@ -1,8 +1,10 @@
 ﻿using FarzamTEWebsite.Data;
 using FarzamTEWebsite.Models;
+using FarzamTEWebsite.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Security.Claims;
 
 namespace FarzamTEWebsite.Controllers
@@ -12,10 +14,12 @@ namespace FarzamTEWebsite.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class BrokerageController : ControllerBase
     {
+        private readonly IBrokerageReports brokerageReports;
         private FarzamDbContext _dbContext;
-        public BrokerageController(FarzamDbContext dbContext)
+        public BrokerageController(FarzamDbContext dbContext, IBrokerageReports brokerageReports)
         {
             _dbContext = dbContext;
+            this.brokerageReports = brokerageReports;
         }
 
         [Authorize]
@@ -489,6 +493,28 @@ namespace FarzamTEWebsite.Controllers
                 BEI_Total_Value = AllTransactions.Sum(t => (long?)t.BEI_Total_Value),
                 BEI_Brokerage_Value_Rank = Brokerage_Rank_BEI_Total_Value?.Rank ?? 0
             });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetBrokerageMoshtaghe(string Date_Monthly)
+        {
+            if (string.IsNullOrEmpty(Date_Monthly))
+                return BadRequest("Date_Monthly is required.");
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var result = await brokerageReports.GetBrokerageMoshtaghe(userId, Date_Monthly);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetBrokerageOnline(string Date_Monthly)
+        {
+            if (string.IsNullOrEmpty(Date_Monthly))
+                return BadRequest("Date_Monthly is required.");
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var result = await brokerageReports.GetBrokerageOnline(userId, Date_Monthly);
+            return Ok(result);
         }
 
         [Authorize]

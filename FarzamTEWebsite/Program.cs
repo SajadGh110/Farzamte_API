@@ -57,6 +57,7 @@ builder.Services.AddDbContext<FarzamDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IInComingCall_StatService, InComingCall_StatService>();
+builder.Services.AddScoped<IBrokerageReports, BrokerageReportsService>();
 
 builder.Services.AddCors(options =>
 {
